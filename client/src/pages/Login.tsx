@@ -1,7 +1,95 @@
-import React from 'react'
+import { Box, Button, Paper, TextField } from '@mui/material'
+import React, { useCallback, useState } from 'react'
+import { Controller, SubmitHandler, useForm } from 'react-hook-form'
+import { useMutation, useQueryClient } from 'react-query';
+import { authServises } from '../servises/auth';
+import { LoginUser } from '../types/User';
 
 export const Login = () => {
+  
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const queryClient = useQueryClient();
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    formState: { errors },
+  } = useForm<LoginUser>({
+    mode: "onChange",
+  });
+
+  const { mutate, isLoading } = useMutation(authServises.login, {
+    onSuccess: (data) => {
+      console.log(data);
+      const message = "success";
+      alert(message);
+    },
+    onError: ()=>{
+      alert("there was an error")
+    },
+    onSettled: ()=>{
+      queryClient.invalidateQueries('create');
+    }
+  });
+
+
+  const onSubmit: SubmitHandler<LoginUser> = useCallback((data) => {
+    const user = {
+      ...data
+    }
+    mutate(user);
+  }, []);
+
+  const onButtonClick = useCallback(() => {
+    setShowPassword((prev) => !prev);
+  }, []);
+
   return (
-    <div>Login</div>
+    <Paper>
+      <Box>
+      <Controller
+          name="username"
+          control={control}
+          defaultValue=""
+          rules={{ required: "Avatal required" }}
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <TextField
+              required
+              type={"text"}
+              label="Avatal"
+              onChange={onChange}
+              value={value}
+              variant="outlined"
+              helperText={error ? error.message : null}
+            />
+          )}
+        />
+
+        <Box>
+          <Controller
+            name="password"
+            control={control}
+            defaultValue=""
+            rules={{ required: "Password required" }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <TextField
+                required
+                error={!!error}
+                type={showPassword ? "text" : "password"}
+                label="Password"
+                onChange={onChange}
+                value={value}
+                variant="outlined"
+                helperText={error ? error.message : null}
+              />
+            )}
+          />
+          <Button onClick={onButtonClick}>{showPassword ? "🫣" : "😶‍🌫️"}</Button>
+        </Box>
+        <Button>Login</Button>
+      </Box>
+    </Paper>
   )
 }

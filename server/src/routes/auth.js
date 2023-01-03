@@ -25,8 +25,8 @@ router.post('/registration', async (req, res) => {
 });
 
 //method to testing
-router.get('./users', async (req,res)=>{
-    const users =  await User.findMany();
+router.get('/users', async (req,res)=>{
+    const users =  await User.find();
     res.send(users);
 })
 
