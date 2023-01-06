@@ -15,14 +15,19 @@ export const authServises = {
   registerUser: async (newUser: User) => {
     await axios.post(API_URL + "/auth/registration", newUser)
     .then((r)=>{
-      console.log(r.status)
+      console.log(r.status);
+      console.log(r.data);
     }).catch((e)=>{
       console.log(e)
     })
   },
   login: async (user: LoginUser) => {
-
+    await axios.post(API_URL + "/auth/login", user)
+    .then((r)=>{
+      console.log(r.status);
+    }).catch((e)=>{
+      console.log(e)
+    })
   },
-  getUsers: () => {
-  },
+  
 };

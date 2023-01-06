@@ -1,16 +1,26 @@
 const { Router } = require('express');
 const User = require('../database/schemas/User');
-const { hashPassword } = require('../utils/helpers');
+const { hashPassword, comparePassword } = require('../utils/helpers');
 
 const router = Router();
 
 router.post('/login', async (req, res) => {
-    console.log(req.body);
+    const {username, password} = req.body;
+    const loginUser = await User.findOne({username});
+    if(loginUser){
+        if(await comparePassword(password, loginUser.password)){
+            console.log(loginUser);
+            res.status(201).send(loginUser);
+        }
+        else res.status(400).send({msg: "Invalid password"});
+    }
+    else res.status(400).send({msg: "User not found"});
+
 });
 
 router.post('/registration', async (req, res) => {
     const { username, email, avatarUrl } = req.body;
-    const UserDB = await User.findOne({$or: [{username},{email}]});
+    const UserDB = await User.findOne({username});
 
     if(UserDB){
         res.status(400).send({msg:"Username alredy exist"});
@@ -21,13 +31,12 @@ router.post('/registration', async (req, res) => {
         const newUser = await User.create({username, email, avatarUrl, password});
         res.send(201);
     }
-
 });
 
 //method to testing
 router.get('/users', async (req,res)=>{
     const users =  await User.find();
-    res.send(users);
+    res.status(200).send(users);
 })
 
 module.exports = router;

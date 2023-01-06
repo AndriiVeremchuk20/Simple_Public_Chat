@@ -22,7 +22,7 @@ export const Registration = () => {
     mode: "onChange",
   });
 
-  const { mutate, isLoading } = useMutation(authServises.registerUser, {
+  const { mutate, isLoading, isSuccess, isError, error } = useMutation(authServises.registerUser, {
     onSuccess: (data) => {
       console.log(data);
       const message = "success";
@@ -98,10 +98,8 @@ export const Registration = () => {
           name="avatarUrl"
           control={control}
           defaultValue=""
-          rules={{ required: "Avatal required" }}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextField
-              required
               type={"text"}
               label="Avatal"
               onChange={onChange}

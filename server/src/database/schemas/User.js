@@ -9,7 +9,6 @@ const UserSchema = mongoose.Schema({
     email:{
         type: mongoose.SchemaTypes.String,
         required: true,
-        unique: true,
     },
     avatarUrl: {
       type: mongoose.SchemaTypes.String,

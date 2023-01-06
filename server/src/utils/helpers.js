@@ -5,8 +5,9 @@ const hashPassword = (password) => {
     return bycript.hashSync(password, salt);
 }
 
-const comparePassword = (raw, hash) => {
-    return bycript.compare(raw, hash);
+const comparePassword = async (raw, hash) => {
+    console.log(`raw: ${raw} hash: ${hash} ${bycript.compare(raw, hash)}`)
+    return await bycript.compare(raw, hash);
 }
 
 module.exports = {

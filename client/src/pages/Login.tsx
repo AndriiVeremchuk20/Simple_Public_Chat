@@ -8,6 +8,7 @@ import { LoginUser } from '../types/User';
 export const Login = () => {
   
   const [showPassword, setShowPassword] = useState<boolean>(false);
+
   const queryClient = useQueryClient();
 
   const {
@@ -49,16 +50,17 @@ export const Login = () => {
   return (
     <Paper>
       <Box>
+
       <Controller
           name="username"
           control={control}
           defaultValue=""
-          rules={{ required: "Avatal required" }}
+          rules={{ required: "Username required" }}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextField
               required
               type={"text"}
-              label="Avatal"
+              label="Username"
               onChange={onChange}
               value={value}
               variant="outlined"
@@ -88,7 +90,7 @@ export const Login = () => {
           />
           <Button onClick={onButtonClick}>{showPassword ? "🫣" : "😶‍🌫️"}</Button>
         </Box>
-        <Button>Login</Button>
+        <Button onClick={handleSubmit(onSubmit)}>Login</Button>
       </Box>
     </Paper>
   )
