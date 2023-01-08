@@ -1,13 +1,13 @@
 const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const authRoute = require('./routes/auth');
-const mongoose = require('mongoose');
+const { PORT } = require('./config');
 
 require('./database')
 
 const app = express();
-const PORT = 8080;
 
 const corsOptions = {
    origin:'*', 

@@ -22,19 +22,18 @@ export const Login = () => {
   });
 
   const { mutate, isLoading } = useMutation(authServises.login, {
+    onError: ()=>{
+      alert("there was an error")
+    },
     onSuccess: (data) => {
       console.log(data);
       const message = "success";
       alert(message);
     },
-    onError: ()=>{
-      alert("there was an error")
-    },
     onSettled: ()=>{
       queryClient.invalidateQueries('create');
     }
   });
-
 
   const onSubmit: SubmitHandler<LoginUser> = useCallback((data) => {
     const user = {

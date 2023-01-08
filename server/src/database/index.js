@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
+const { dbUrl } = require('../config');
 
-const url = `mongodb://127.0.0.1:27017/twitterClon`;
-
-mongoose.connect(url)
+mongoose.connect(dbUrl)
 .then(()=>{console.log("connected to database")})
 .catch((error)=>{console.log(error)});

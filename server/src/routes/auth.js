@@ -1,42 +1,96 @@
 const { Router } = require('express');
-const User = require('../database/schemas/User');
+const { check, validationResult } = require('express-validator');
 const { hashPassword, comparePassword } = require('../utils/helpers');
-
+const jwt = require('jsonwebtoken');
+const User = require('../database/schemas/User');
+const Roles = require('../database/schemas/Roles');
+const { secret } = require('../config');
 const router = Router();
 
-router.post('/login', async (req, res) => {
-    const {username, password} = req.body;
-    const loginUser = await User.findOne({username});
-    if(loginUser){
-        if(await comparePassword(password, loginUser.password)){
-            console.log(loginUser);
-            res.status(201).send(loginUser);
+const generateAccessTocken = (id, roles) => {
+    const payload = {
+        id,
+        roles,
+    }  
+    return jwt.sign(payload, secret, {expiresIn: "1h"});
+}
+
+router.post('/registration',
+    [
+        check("username", "Uncorrect username").isLength({ min: 4, max: 12 }),
+        check("email", "Uncorrect email").isEmail(),
+        check("password", "Uncorrect password").isLength({ min: 4 }),
+    ],
+    async (req, res) => {
+
+        try {
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                res.status(400).send({ msg: "uncorrect request", errors });
+            }
+
+            const { username, email, avatarUrl } = req.body;
+            const userDB = await User.findOne({ username });
+
+            if (userDB) {
+                res.status(400).send({ msg: `Username '${username}' alredy exist` });
+            }
+            else {
+                const userRole = await Roles.findOne({ value: "USER" });
+                const password = hashPassword(req.body.password);
+                const newUser = await User.create({ username, email, avatarUrl, password, roles: [userRole.value] });
+                res.status(201).send({ msg: "Registration successful" });
+            }
+
+        } catch (e) {
+            console.error(e);
+            res.status(500).send({ msg: "Registration server error" });
         }
-        else res.status(400).send({msg: "Invalid password"});
-    }
-    else res.status(400).send({msg: "User not found"});
+    });
 
-});
+router.post('/login', async (req, res) => {
+    try {
 
-router.post('/registration', async (req, res) => {
-    const { username, email, avatarUrl } = req.body;
-    const UserDB = await User.findOne({username});
+        const { username, password } = req.body;
+        const user = await User.findOne({ username });
 
-    if(UserDB){
-        res.status(400).send({msg:"Username alredy exist"});
-    }
-    else {
-        const password = hashPassword(req.body.password);
-        console.log(password);
-        const newUser = await User.create({username, email, avatarUrl, password});
-        res.send(201);
+        if (!user) {
+            res.status(500).send({ msg: `User '${username}' not found` });
+        }
+
+        if (await comparePassword(password, user.password)) {
+            console.log(user);
+            const tocken = generateAccessTocken(user._id, user.roles) 
+            res.status(201).send({tocken});
+        }
+        else res.status(400).send({ msg: "Invalid password" });
+
+    } catch (e) {
+        console.log(e);
+        res.status(500).send({ msg: "Login server error" });
     }
 });
 
 //method to testing
-router.get('/users', async (req,res)=>{
-    const users =  await User.find();
-    res.status(200).send(users);
+router.get('/users', async (req, res) => {
+    try{
+
+        const users = await User.find();
+        res.status(200).send(users);
+
+    }catch(e){
+        console.error(e);
+        res.status(500).send({msg: "Server error"})
+    }
+});
+
+router.get("/user", async (req, res) => {
+    const { id } = req.query;
+    const user = await User.findOne({ _id: id });
+    const roles = await Roles.find(user.roles);
+    console.log(roles);
+    res.status(200).send(user);
 })
 
 module.exports = router;
