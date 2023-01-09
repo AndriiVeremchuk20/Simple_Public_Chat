@@ -1,33 +1,38 @@
 import axios from "axios";
-import { LoginUser, User } from "../types/User";
+import { LoginUser, RegistrationUser, User} from "../types/User";
 
 //const PORT = 8080;
 const API_URL = `http://localhost:8080`;
+const token = "token";
 
-axios.create({
+const client = axios.create({
   baseURL: API_URL,
   headers: {
     "Content-type": "application/json",
   },
-})
+});
+
+const register = async (newUser: RegistrationUser) => {
+  const response = await client.post<any>("/auth/registration", newUser);
+  return response.data;
+};
+
+const login = async (user: LoginUser) => {
+  const response = await client.post<any>("/auth/login", user);
+  const { data } = response;
+  
+  localStorage.setItem(token, data.token);
+  console.log(response.data);
+  
+  return response.data;
+};
+
+const auth = async () => {
+  //const response = await client.get();
+
+};
 
 export const authServises = {
-  registerUser: async (newUser: User) => {
-    await axios.post(API_URL + "/auth/registration", newUser)
-    .then((r)=>{
-      console.log(r.status);
-      console.log(r.data);
-    }).catch((e)=>{
-      console.log(e)
-    })
-  },
-  login: async (user: LoginUser) => {
-    await axios.post(API_URL + "/auth/login", user)
-    .then((r)=>{
-      console.log(r.status);
-    }).catch((e)=>{
-      console.log(e)
-    })
-  },
-  
+  register,
+  login,
 };

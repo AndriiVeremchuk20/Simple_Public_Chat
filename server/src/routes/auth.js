@@ -1,18 +1,20 @@
 const { Router } = require('express');
 const { check, validationResult } = require('express-validator');
-const { hashPassword, comparePassword } = require('../utils/helpers');
 const jwt = require('jsonwebtoken');
+const { hashPassword, comparePassword } = require('../utils/helpers');
 const User = require('../database/schemas/User');
 const Roles = require('../database/schemas/Roles');
 const { secret } = require('../config');
+const authMiddleware = require('../middleware/authMiddleware');
+const roleMiddleware = require('../middleware/roleMiddleware');
 const router = Router();
 
 const generateAccessTocken = (id, roles) => {
     const payload = {
         id,
         roles,
-    }  
-    return jwt.sign(payload, secret, {expiresIn: "1h"});
+    }
+    return jwt.sign(payload, secret, { expiresIn: "1h" });
 }
 
 router.post('/registration',
@@ -61,8 +63,17 @@ router.post('/login', async (req, res) => {
 
         if (await comparePassword(password, user.password)) {
             console.log(user);
-            const tocken = generateAccessTocken(user._id, user.roles) 
-            res.status(201).send({tocken});
+            const token = generateAccessTocken(user._id, user.roles)
+            res.status(201).send({
+                token,
+                user: {
+                    id: user._id,
+                    username: user.username,
+                    email: user.email,
+                    createdAT: user.createdAT,
+                    avatarUrl: user.avatarUrl,
+                }
+            });
         }
         else res.status(400).send({ msg: "Invalid password" });
 
@@ -72,63 +83,51 @@ router.post('/login', async (req, res) => {
     }
 });
 
-//method to testing
-router.get('/users', async (req, res) => {
-    try{
+router.get('/auth', authMiddleware, async (req, res) => {
+    try {
+        const { id } = req.user;
+        const user = await User.findOne({ _id: id });
 
+        const token = generateAccessTocken();
+        res.status(201).send({
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                createdAT: user.createdAT,
+                avatarUrl: user.avatarUrl,
+            }
+        })
+
+    } catch (e) {
+        console.error(e);
+        res.status(403).send({ msg: "Server Error" });
+    }
+})
+
+//method to testing
+router.get('/users', roleMiddleware(["ADMIN"]), async (req, res) => {
+    try {
         const users = await User.find();
         res.status(200).send(users);
-
-    }catch(e){
+    } catch (e) {
         console.error(e);
-        res.status(500).send({msg: "Server error"})
+        res.status(500).send({ msg: "Server error" })
     }
 });
 
-router.get("/user", async (req, res) => {
-    const { id } = req.query;
-    const user = await User.findOne({ _id: id });
-    const roles = await Roles.find(user.roles);
-    console.log(roles);
-    res.status(200).send(user);
+router.get("/user", roleMiddleware(["ADMIN"]), async (req, res) => {
+    try {
+        const { id } = req.query;
+        const user = await User.findOne({ _id: id });
+        const roles = await Roles.find(user.roles);
+        console.log(roles);
+        res.status(200).send(user);
+    } catch (e) {
+        console.error(e);
+        res.status(500).send({ msg: "Server error" });
+    }
 })
 
 module.exports = router;
-
-/*
-
-router.post('/login', async (req, res)=>{
-    const { username, password } = req.body;
-    if(!username || !password) return res.send(400);
-    const userDB = await User.findOne({username});
-    if(!userDB) return res.send(401);
-    const isValid = comparePassword(password, userDB.password);
-    if(isValid){
-        console.log("all good");
-        res.send(200);
-    }else{
-        console.log("all bad");
-        res.send(401);
-    }
-
-});
-*/
-/*
-router.post('/registration', async (req, res)=>{
-    const { username, email } = req.body;
-
-    const UserDB = await User.findOne({$or: [{username},{email}]});
-
-    if(UserDB){
-        res.status(400).send({msg: "Username or email alredy exist"});
-    }
-    else {
-        const password = hashPassword(req.body.password);
-        console.log("good")
-        console.log(password);
-        const newUser = await User.create({username, password, email});
-        res.send(201);
-    }
-})
-*/
-

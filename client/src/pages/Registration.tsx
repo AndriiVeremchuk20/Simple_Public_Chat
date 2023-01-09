@@ -4,25 +4,22 @@ import React, { useCallback, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { authServises } from "../servises/auth";
-import { User } from "../types/User";
-
-type user = Omit<User, "createdAt">;
+import { RegistrationUser, User } from "../types/User";
 
 export const Registration = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const queryClient = useQueryClient();
 
   const {
-    register,
     handleSubmit,
     control,
-    watch,
     formState: { errors },
-  } = useForm<user>({
+  } = useForm<RegistrationUser>({
     mode: "onChange",
   });
 
-  const { mutate, isLoading, isSuccess, isError, error } = useMutation(authServises.registerUser, {
+  const { mutate, isLoading, isSuccess, isError, error } = useMutation(authServises.register, {
+   
     onSuccess: (data) => {
       console.log(data);
       const message = "success";
@@ -36,8 +33,7 @@ export const Registration = () => {
     }
   });
 
-
-  const onSubmit: SubmitHandler<user> = useCallback((data) => {
+  const onSubmit: SubmitHandler<RegistrationUser> = useCallback((data) => {
     const newUser = {
       ...data
     }
@@ -48,15 +44,9 @@ export const Registration = () => {
     setShowPassword((prev) => !prev);
   }, []);
 
-
   return (
     <Paper style={styles.main}>
-      <Box
-        flexDirection={"column"}
-        display="flex"
-        justifyContent={"space-around"}
-        height={"40vh"}
-      >
+      <Box sx={styles.form}>
         <Controller
           name="username"
           control={control}
@@ -64,6 +54,7 @@ export const Registration = () => {
           rules={{ required: "Username required" }}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextField
+              sx={styles.input}
               required
               error={!!error}
               type={"text"}
@@ -82,6 +73,7 @@ export const Registration = () => {
           rules={{ required: "Email required" }}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextField
+            sx={styles.input}
               required
               error={!!error}
               type={"email"}
@@ -100,6 +92,7 @@ export const Registration = () => {
           defaultValue=""
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextField
+            sx={styles.input}
               type={"text"}
               label="Avatal"
               onChange={onChange}
@@ -110,7 +103,7 @@ export const Registration = () => {
           )}
         />
 
-        <Box>
+        <Box sx={styles.inputPassword}>
           <Controller
             name="password"
             control={control}
@@ -119,6 +112,7 @@ export const Registration = () => {
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <TextField
                 required
+              sx={styles.input}
                 error={!!error}
                 type={showPassword ? "text" : "password"}
                 label="Password"
@@ -139,10 +133,28 @@ export const Registration = () => {
 
 const styles = {
   main: {
-    width: "100vw",
     height: "100vh",
+    width: "100vw",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
   },
-};
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    border: "solid black 3px",
+    borderRadius: "5px",
+    padding: "20px",
+  },
+  input: {
+    width: "100%",
+    margin: "5px",
+  },
+  inputPassword: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center", 
+  },
+}
