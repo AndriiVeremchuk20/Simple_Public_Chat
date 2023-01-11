@@ -1,15 +1,22 @@
 import React, { useCallback, useState } from "react";
-import { Alert, Button, Paper, TextField } from "@mui/material";
+import {
+  Alert,
+  Button,
+  CircularProgress,
+  Paper,
+  TextField,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
-import { authServises } from "../servises/auth";
+import { authServises } from "../servises/API";
 import { RegistrationUser, User } from "../types/User";
 import { Link, useNavigate } from "react-router-dom";
 import { AppRoutes } from "../routes";
 
 export const Registration = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const navigate = useNavigate();
 
   const {
@@ -20,19 +27,25 @@ export const Registration = () => {
     mode: "onChange",
   });
 
-  const { mutate, isLoading, isError, error } = useMutation(authServises.register, {
-    onSuccess: (data) => {
-      navigate(AppRoutes.login);
-    },
-    onError: (error: any)=>{
-  
-    },
-  });
+  const { mutate, isLoading, isError, error } = useMutation(
+    authServises.register,
+    {
+      onSuccess: (data) => {
+        navigate(AppRoutes.login);
+      },
+      onError: (error: any) => {
+        const errorText = error.response.data.msg
+          ? error.response.data.msg
+          : error.message;
+        setErrorMessage(errorText);
+      },
+    }
+  );
 
   const onSubmit: SubmitHandler<RegistrationUser> = useCallback((data) => {
     const newUser = {
-      ...data
-    }
+      ...data,
+    };
     mutate(newUser);
   }, []);
 
@@ -69,7 +82,7 @@ export const Registration = () => {
           rules={{ required: "Email required" }}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextField
-            sx={styles.input}
+              sx={styles.input}
               required
               error={!!error}
               type={"email"}
@@ -88,7 +101,7 @@ export const Registration = () => {
           defaultValue=""
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextField
-            sx={styles.input}
+              sx={styles.input}
               type={"text"}
               label="Avatal"
               onChange={onChange}
@@ -108,7 +121,7 @@ export const Registration = () => {
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <TextField
                 required
-              sx={styles.input}
+                sx={styles.input}
                 error={!!error}
                 type={showPassword ? "text" : "password"}
                 label="Password"
@@ -121,14 +134,13 @@ export const Registration = () => {
           />
           <Button onClick={onButtonClick}>{showPassword ? "🫣" : "😶‍🌫️"}</Button>
         </Box>
-        <Button onClick={handleSubmit(onSubmit)}>Reg🤝🏼</Button>
-        
-        {
-          isError?<Alert color="error">{error.response.data.msg?error.response.data.msg:error.message}</Alert>:null
-        }
+        <Button onClick={handleSubmit(onSubmit)}>
+          {isLoading ? <CircularProgress size={10} /> : "Register"}
+        </Button>
+
+        {isError ? <Alert color="error">{errorMessage}</Alert> : null}
 
         <Link to={AppRoutes.login}>Login</Link>
-        
       </Box>
     </Paper>
   );
@@ -158,6 +170,6 @@ const styles = {
   inputPassword: {
     display: "flex",
     justifyContent: "center",
-    alignItems: "center", 
+    alignItems: "center",
   },
-}
+};

@@ -11,8 +11,8 @@ const router = Router();
 
 const generateAccessTocken = (id, roles) => {
     const payload = {
-        id,
-        roles,
+        id: id,
+        roles: roles,
     }
     return jwt.sign(payload, secret, { expiresIn: "1h" });
 }
@@ -57,11 +57,9 @@ router.post('/login', async (req, res) => {
         const { username, password } = req.body;
         const user = await User.findOne({ username });
 
-
         if (!user) {
             res.status(500).send({ msg: `User '${username}' not found` });
         }
-
 
         else if (await comparePassword(password, user.password)) {
             console.log(user);
@@ -88,9 +86,10 @@ router.post('/login', async (req, res) => {
 router.get('/auth', authMiddleware, async (req, res) => {
     try {
         const { id } = req.user;
+        console.log(req.user);
         const user = await User.findOne({ _id: id });
 
-        const token = generateAccessTocken();
+        const token = generateAccessTocken(user._id, user.roles);
         res.status(201).send({
             token,
             user: {

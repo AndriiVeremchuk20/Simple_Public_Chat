@@ -8,7 +8,7 @@ module.exports = (roles) => {
         }
 
         try {
-            const token = req.headers.authorization.split(' ')[1];
+            const token = req.headers.autorization;
             if (!token) {
                 return res.status(403).send({ msg: "User is not authorize" });
             }
