@@ -1,8 +1,12 @@
 import React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { useAppSelector } from './hooks/reduxHooks'
+import { Home } from './pages/Home'
 import { Login } from './pages/Login'
+import { NoPage } from './pages/NoPage'
 import { Registration } from './pages/Registration'
+import { AppRoutes } from './routes'
+import { PrivateRoute } from './utils/PrivateRoute'
 
 export const App = () => {
 
@@ -10,13 +14,14 @@ export const App = () => {
 
   return (
     <div>
-      <div>
-        {user?<h1>{`Hello ${user?.username}`}</h1>:<h1>Sorry, idk who are you</h1>}
-      </div>
       <BrowserRouter>
         <Routes>
-          <Route index path='/' element={<Login/>} />
-          <Route index path='/registration' element={<Registration/>} />
+          <Route index path={AppRoutes.login} element={<Login/>} />
+          <Route path={AppRoutes.registration} element={<Registration/>} />
+          <Route path={AppRoutes.home} element={<PrivateRoute redirectPath={AppRoutes.login} user={user} children={<Home/>}/>}>
+
+          </Route>
+          <Route path={AppRoutes.noPage} element={<NoPage />}/>
         </Routes>
       </BrowserRouter>
     </div>

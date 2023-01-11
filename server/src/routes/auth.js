@@ -57,11 +57,13 @@ router.post('/login', async (req, res) => {
         const { username, password } = req.body;
         const user = await User.findOne({ username });
 
+
         if (!user) {
             res.status(500).send({ msg: `User '${username}' not found` });
         }
 
-        if (await comparePassword(password, user.password)) {
+
+        else if (await comparePassword(password, user.password)) {
             console.log(user);
             const token = generateAccessTocken(user._id, user.roles)
             res.status(201).send({

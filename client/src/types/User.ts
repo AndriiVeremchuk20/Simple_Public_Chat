@@ -17,6 +17,10 @@ export interface User {
     avatarUrl: string|null;
 }
 
+export interface ResponseError {
+    msg: string;
+}
+
 //data example
 /*
 tocken: 

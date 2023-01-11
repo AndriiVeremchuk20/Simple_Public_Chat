@@ -1,14 +1,16 @@
-import { Button, Paper, TextField } from "@mui/material";
-import { Box } from "@mui/system";
 import React, { useCallback, useState } from "react";
+import { Alert, Button, Paper, TextField } from "@mui/material";
+import { Box } from "@mui/system";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useMutation } from "react-query";
 import { authServises } from "../servises/auth";
 import { RegistrationUser, User } from "../types/User";
+import { Link, useNavigate } from "react-router-dom";
+import { AppRoutes } from "../routes";
 
 export const Registration = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const {
     handleSubmit,
@@ -18,19 +20,13 @@ export const Registration = () => {
     mode: "onChange",
   });
 
-  const { mutate, isLoading, isSuccess, isError, error } = useMutation(authServises.register, {
-   
+  const { mutate, isLoading, isError, error } = useMutation(authServises.register, {
     onSuccess: (data) => {
-      console.log(data);
-      const message = "success";
-      alert(message);
+      navigate(AppRoutes.login);
     },
-    onError: ()=>{
-      alert("there was an error")
+    onError: (error: any)=>{
+  
     },
-    onSettled: ()=>{
-      queryClient.invalidateQueries('create');
-    }
   });
 
   const onSubmit: SubmitHandler<RegistrationUser> = useCallback((data) => {
@@ -126,6 +122,13 @@ export const Registration = () => {
           <Button onClick={onButtonClick}>{showPassword ? "🫣" : "😶‍🌫️"}</Button>
         </Box>
         <Button onClick={handleSubmit(onSubmit)}>Reg🤝🏼</Button>
+        
+        {
+          isError?<Alert color="error">{error.response.data.msg?error.response.data.msg:error.message}</Alert>:null
+        }
+
+        <Link to={AppRoutes.login}>Login</Link>
+        
       </Box>
     </Paper>
   );

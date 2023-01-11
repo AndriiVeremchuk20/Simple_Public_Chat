@@ -1,17 +1,33 @@
-import { Alert, Box, Button, CircularProgress, Paper, TextField } from '@mui/material'
 import React, { useCallback, useState } from 'react'
+import { Alert, Box, Button, CircularProgress, Paper, TextField } from '@mui/material'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { useMutation } from 'react-query';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+
 import { useAppDispatch, useAppSelector } from '../hooks/reduxHooks';
 import { authServises } from '../servises/auth';
 import { setUser } from '../store/userSlice';
-import { LoginUser, User } from '../types/User';
+import { LoginUser } from '../types/User';
+import { Link, useNavigate } from 'react-router-dom';
+import { AppRoutes } from '../routes';
 
 export const Login = () => {
   
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const navigator = useNavigate();
   const dispatch = useAppDispatch(); 
   const user = useAppSelector(state => state.user.user);
+
+  const formScheme = Yup.object().shape({
+    password: Yup.string()
+    .required("password is required")
+    .min(4, "Min password lenght 4")
+    .max(12, "Max password lenght 4"),
+    username: Yup.string()
+    .required("username is reqiured")
+    .min(4, "Min length for username 4"),  
+  })
 
   const {
     handleSubmit,
@@ -19,11 +35,18 @@ export const Login = () => {
     formState: { errors },
   } = useForm<LoginUser>({
     mode: "onChange",
+    resolver: yupResolver(formScheme),
   });
 
-  const { mutate, isLoading, isError } = useMutation(authServises.login, {
+  const errorText = useAppSelector(state => state.user.error?.msg);
+
+  const { mutate, isLoading, isError, error } = useMutation(authServises.login, {
     onSuccess: (data)=>{
       dispatch(setUser(data.user));
+      navigator(AppRoutes.home);
+    },
+    onError: (error: any)=>{
+      console.log(error.response.data.msg);
     }
     //Error .... 
   });
@@ -46,10 +69,10 @@ export const Login = () => {
           name="username"
           control={control}
           defaultValue=""
-          rules={{ required: "Username required" }}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextField
               sx={styles.input}
+              error={!!error}
               required
               type={"text"}
               label="Username"
@@ -66,7 +89,6 @@ export const Login = () => {
             name="password"
             control={control}
             defaultValue=""
-            rules={{ required: "Password required" }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <TextField
                 required
@@ -86,8 +108,9 @@ export const Login = () => {
           isLoading? <CircularProgress size={30}/>: <Button sx={styles.input} onClick={handleSubmit(onSubmit)}>Login</Button>
          }
          {
-          isError?<Alert color='error'>Ops fucking server</Alert>:null
+           isError?<Alert color='error'>{error.response.data.msg?error.response.data.msg:error.message}</Alert>:null
          }
+         <Link to={AppRoutes.registration}>Registration</Link>
       </Box>
     </Paper>
   )

@@ -1,14 +1,18 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { User } from "../types/User";
+import { ResponseError, User } from "../types/User";
 
 type UserState = {
   user: User | null;
+  error: ResponseError | null;
   isAuth: boolean;
+  isError: boolean;
 };
 
 const initialState: UserState = {
   user: null,
+  error: null,
   isAuth: false,
+  isError: false,
 };
 
 const userSlice = createSlice({
@@ -16,16 +20,19 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser(state, action: PayloadAction<User>) {
-        state.user = action.payload;
-        state.isAuth = true;
+      state.user = action.payload;
+      state.isAuth = true;
     },
-    removeCurrentUser(state, action: PayloadAction) {
-        state.user = null;
-        state.isAuth = false;
-    },
+    setError(state, action: PayloadAction<ResponseError>) {
+      state = {
+        ...state, 
+        error: action.payload,
+        isError: true,
+      }
+    }
   },
 });
 
-export const { setUser, removeCurrentUser } = userSlice.actions;
+export const { setUser, setError } = userSlice.actions;
 
 export default userSlice.reducer;
