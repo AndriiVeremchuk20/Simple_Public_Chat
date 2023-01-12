@@ -12,19 +12,19 @@ import { useMutation } from "react-query";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
-import { useAppDispatch } from "../hooks/reduxHooks";
 import { authServises } from "../servises/API";
-import { setUser } from "../store/userSlice";
-import { LoginUser } from "../types/User";
+import { LoginUser, User } from "../types/User";
 import { Link, useNavigate } from "react-router-dom";
 import { AppRoutes } from "../routes";
 import { Token } from "../utils/token";
+import { useAtom } from "jotai";
+import { appUserAtom } from "../atom";
 
 export const Login = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const navigator = useNavigate();
-  const dispatch = useAppDispatch();
+  const [user, setUser] = useAtom(appUserAtom);
+  const navigate = useNavigate();
 
   const formScheme = Yup.object().shape({
     password: Yup.string()
@@ -45,12 +45,14 @@ export const Login = () => {
     resolver: yupResolver(formScheme),
   });
 
+  //const user = useAppSelector(state=>state.appUser.user)
+
   const { mutate, isLoading, isError, error } = useMutation(
     authServises.login,
     {
       onSuccess: (data) => {
-        dispatch(setUser(data.user));
-        navigator(AppRoutes.home);
+        setUser(data.user as User)
+        navigate(AppRoutes.home);
       },
       onError: (error: any) => {
         const errorText = error.response.data.msg

@@ -2,9 +2,8 @@ import axios from "axios";
 import { LoginUser, RegistrationUser, User } from "../types/User";
 import { Token } from "../utils/token";
 
-//const PORT = 8080;
-const API_URL = `http://localhost:8080`;
-const token = "token";
+const PORT = 8080;
+const API_URL = `http://localhost:${PORT}`;
 
 const client = axios.create({
   baseURL: API_URL,
@@ -45,20 +44,3 @@ export const authServises = {
   login,
   auth,
 };
-
-/*
-export const auth =  () => {
-    return async dispatch => {
-        try {
-            const response = await axios.get(`http://localhost:5000/api/auth/auth`,
-                {headers:{Authorization:`Bearer ${localStorage.getItem('token')}`}}
-            )
-            dispatch(setUser(response.data.user))
-            localStorage.setItem('token', response.data.token)
-        } catch (e) {
-            alert(e.response.data.message)
-            localStorage.removeItem('token')
-        }
-    }
-}
-*/

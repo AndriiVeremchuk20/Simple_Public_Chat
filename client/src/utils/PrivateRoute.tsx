@@ -10,6 +10,7 @@ interface PrivateRouteProps  {
 
 export const PrivateRoute: React.FC<PrivateRouteProps> = ({user, children, redirectPath}) => {    
     if(!user){
+        console.warn(`Private route ${user}`);
         return <Navigate to={redirectPath} replace />
     }
 
