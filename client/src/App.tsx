@@ -12,12 +12,13 @@ import { WaitPage } from "./pages/WaitPage";
 import { AppRoutes } from "./routes";
 import { authServises } from "./servises/API";
 import { PrivateRoute } from "./utils/PrivateRoute";
+import { Token } from "./utils/token";
 
 export const App = () => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [user, setUser] = useAtom(appUserAtom);
 
-  const { mutate, isLoading, isSuccess, isError } = useMutation(
+  const { mutate, isLoading, isSuccess } = useMutation(
     authServises.auth,
     {
       onSuccess: (data) => {
@@ -28,6 +29,7 @@ export const App = () => {
           ? error.response.data.msg
           : error.message;
         setErrorMessage(errorText);
+        Token.Remove();
       },
     }
   );

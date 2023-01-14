@@ -1,7 +1,11 @@
+import { Box } from '@mui/material'
 import React from 'react'
 
 export const Search = () => {
+  
   return (
-    <div>Search</div>
+    <Box>
+      Search    
+    </Box>
   )
 }

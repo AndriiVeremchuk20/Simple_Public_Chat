@@ -103,11 +103,35 @@ router.get('/auth', authMiddleware, async (req, res) => {
 
     } catch (e) {
         console.error(e);
-        res.status(403).send({ msg: "Server Error" });
+        res.status(403).send({ msg: "Server error" });
     }
 })
 
-//method to testing
+router.delete('/user', authMiddleware, async(req,res)=>{
+    try{
+        const { id, roles } = req.user;
+        console.warn("Delete user", req.user);
+
+        if(roles.some((role)=>role === "ADMIN")){
+            console.log("Cannot delete ADMIN account");
+            return res.status(400).send({ msg: "Cannot delete ADMIN account"});
+        }
+
+        const { acknowledged } = await User.deleteOne({_id: id})
+        
+        if(!acknowledged) {
+            res.status(400).send({ msg: "Cannot delete account"});
+        }
+        else {
+            res.status(202).send({msg: "deleted complete"});
+        }
+        
+    }catch(e){
+        console.log(e);
+        res.status(500).send({msg: "Server error"})
+    }
+})
+
 router.get('/users', roleMiddleware(["ADMIN"]), async (req, res) => {
     try {
         const users = await User.find();

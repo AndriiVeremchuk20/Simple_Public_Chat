@@ -134,7 +134,7 @@ export const Registration = () => {
           <Button onClick={onButtonClick}>{showPassword ? '🫣' : '😶‍🌫️'}</Button>
         </Box>
         <Button onClick={handleSubmit(onSubmit)}>
-          {isLoading ? <CircularProgress size={10} /> : 'Register'}
+          {isLoading ? <CircularProgress size={30} /> : 'Register'}
         </Button>
 
         {isError ? <Alert color="error">{errorMessage}</Alert> : null}

@@ -18,10 +18,7 @@ export const Home = () => {
   return (
     <Paper sx={styles.main}>
       <SearchBar/>
-      <div>
-        Hello mr {user?.username}
-        <Button onClick={onLogoutClick}> Logout </Button>
-      </div>
+      
       <MakePost />
     </Paper>
   );
