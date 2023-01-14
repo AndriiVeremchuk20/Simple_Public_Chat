@@ -1,28 +1,27 @@
+import { Alert } from "@mui/material";
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { useMutation } from "react-query";
-import { BrowserRouter, redirect, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import { appUserAtom } from "./atom";
 import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { NoPage } from "./pages/NoPage";
 import { Registration } from "./pages/Registration";
+import { WaitPage } from "./pages/WaitPage";
 import { AppRoutes } from "./routes";
 import { authServises } from "./servises/API";
-import { User } from "./types/User";
 import { PrivateRoute } from "./utils/PrivateRoute";
 
 export const App = () => {
-
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [user, setUser] = useAtom(appUserAtom);
-  
+
   const { mutate, isLoading, isSuccess, isError } = useMutation(
     authServises.auth,
     {
       onSuccess: (data) => {
-        console.log(data.user);
-        setUser(data.user as User);
+        setUser(data.user);
       },
       onError: (error: any) => {
         const errorText = error.response.data.msg
@@ -37,15 +36,23 @@ export const App = () => {
     mutate();
   }, []);
 
+
+  // if (isError) {
+  //   return <Alert variant="filled" severity="error">
+  //     Error: {errorMessage}
+  //   </Alert>;
+  // }
+
+  if (isLoading) {
+    return <WaitPage />;
+  }
+  
   return (
-    <div>
-      <div>
-        Current user is {user?.username}
-      </div>
-      <BrowserRouter>
-        <Routes>
-         <Route
-            index={!!user}
+    <BrowserRouter>
+      <Routes>
+        {isSuccess && user ? (
+          <Route
+            index
             path={AppRoutes.home}
             element={
               <PrivateRoute
@@ -55,11 +62,14 @@ export const App = () => {
               />
             }
           ></Route>
-          <Route path={AppRoutes.login} element={<Login />} />
-          <Route path={AppRoutes.registration} element={<Registration />} />
-          <Route path={AppRoutes.noPage} element={<NoPage />} />
-        </Routes>
-      </BrowserRouter>
-    </div>
+        ) : (
+          <>
+            <Route index path={AppRoutes.login} element={<Login />} />
+            <Route path={AppRoutes.registration} element={<Registration />} />
+          </>
+        )}
+        <Route path={AppRoutes.noPage} element={<NoPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 };

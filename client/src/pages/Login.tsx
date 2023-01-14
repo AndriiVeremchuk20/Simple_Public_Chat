@@ -23,7 +23,7 @@ import { appUserAtom } from "../atom";
 export const Login = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [user, setUser] = useAtom(appUserAtom);
+  const [,setUser] = useAtom(appUserAtom);
   const navigate = useNavigate();
 
   const formScheme = Yup.object().shape({
@@ -39,20 +39,18 @@ export const Login = () => {
   const {
     handleSubmit,
     control,
-    formState: { errors },
+    //formState: { errors },
   } = useForm<LoginUser>({
     mode: "onChange",
     resolver: yupResolver(formScheme),
   });
 
-  //const user = useAppSelector(state=>state.appUser.user)
-
-  const { mutate, isLoading, isError, error } = useMutation(
+  const { mutate, isLoading, isError } = useMutation(
     authServises.login,
     {
       onSuccess: (data) => {
-        setUser(data.user as User)
-        navigate(AppRoutes.home);
+        setUser(data.user);
+        navigate(0);
       },
       onError: (error: any) => {
         const errorText = error.response.data.msg
@@ -70,7 +68,7 @@ export const Login = () => {
       ...data,
     };
     mutate(user);
-  }, []);
+  }, [mutate]);
 
   const onButtonClick = useCallback(() => {
     setShowPassword((prev) => !prev);
@@ -86,14 +84,14 @@ export const Login = () => {
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextField
               sx={styles.input}
-              error={!!error}
+              error={!(error == null)}
               required
               type={"text"}
               label="Username"
               onChange={onChange}
               value={value}
               variant="outlined"
-              helperText={error ? error.message : null}
+              helperText={error != null ? error.message : null}
             />
           )}
         />
@@ -106,13 +104,13 @@ export const Login = () => {
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <TextField
                 required
-                error={!!error}
+                error={!(error == null)}
                 type={showPassword ? "text" : "password"}
                 label="Password"
                 onChange={onChange}
                 value={value}
                 variant="outlined"
-                helperText={error ? error.message : null}
+                helperText={error != null ? error.message : null}
               />
             )}
           />

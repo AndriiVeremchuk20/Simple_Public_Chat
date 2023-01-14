@@ -12,14 +12,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 export const NoPage = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  
-  const onBackClick = useCallback(()=>{
-    navigate(-1);
-  },[]);
 
-  const onRefreshClick = useCallback(()=>{
+  const onBackClick = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
+  const onRefreshClick = useCallback(() => {
     navigate(0);
-  },[])
+  }, [navigate]);
 
   return (
     <Paper style={styles.main}>
@@ -32,8 +32,12 @@ export const NoPage = () => {
           color="error"
         >{`Path '${pathname}' does not exist`}</Alert>
         <ButtonGroup sx={styles.buttons}>
-          <Button variant="outlined" onClick={onBackClick}>Back</Button>
-          <Button variant="outlined" onClick={onRefreshClick}>Refresh</Button>
+          <Button variant="outlined" onClick={onBackClick}>
+            Back
+          </Button>
+          <Button variant="outlined" onClick={onRefreshClick}>
+            Refresh
+          </Button>
         </ButtonGroup>
       </Box>
     </Paper>
@@ -57,5 +61,5 @@ const styles = {
   },
   buttons: {
     margin: "10px 0 ",
-  }
+  },
 };
