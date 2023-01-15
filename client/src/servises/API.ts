@@ -1,5 +1,5 @@
 import axios from "axios";
-import { LoginUser, RegistrationUser } from "../types/User";
+import { LoginUser, RegistrationUser, responseSearchType, User } from "../types/User";
 import { Token } from "../utils/token";
 
 const PORT = 8080;
@@ -48,9 +48,27 @@ const deleteAccount = async () => {
   return response.data;
 };
 
+const searchUsers = async (searchText: string) => {
+  const token = Token.Get();
+  const response = await client.get<responseSearchType>(`auth/search?username=${searchText}`, {
+    headers: { Authorization: token },
+  });
+  return response.data;
+};
+
+const getUserInfo = async (userID: string) => {
+  const token = Token.Get();
+  const response = await client.get<User>(`auth/user${userID}`, {
+    headers: { Authorization: token },
+  });
+  return response.data;
+}
+
 export const authServises = {
   register,
   login,
   auth,
   deleteAccount,
+  searchUsers,
+  getUserInfo,
 };

@@ -1,25 +1,29 @@
 export interface RegistrationUser {
-  username: string
-  email: string
-  avatarUrl: string | null
-  password: string
+  username: string;
+  email: string;
+  avatarUrl: string | null;
+  password: string;
 }
 
 export interface LoginUser {
-  username: string
-  password: string
+  username: string;
+  password: string;
 }
 
 export interface User {
-  id: string
-  username: string
-  email: string
-  avatarUrl: string | null
+  id: string;
+  username: string;
+  email: string;
+  avatarUrl: string | null;
+  createdAt: Date;
 }
 
-export interface ResponseError {
-  msg: string
-}
+export type responseSearchType = Array<{
+  username: string;
+  email: string;
+  avatarUrl: string | null;
+  _id: string;
+}>;
 
 // data example
 /*

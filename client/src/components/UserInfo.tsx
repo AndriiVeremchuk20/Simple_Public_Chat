@@ -1,4 +1,5 @@
 import {
+  Alert,
   Avatar,
   Button,
   CircularProgress,
@@ -17,19 +18,23 @@ export const UserInfo = () => {
   const [anchorMenu, setAnchorMenu] = useState<null | HTMLElement>(null);
   const [user, setUser] = useAtom(appUserAtom);
 
-  const { mutate, isLoading } = useMutation(authServises.deleteAccount, {
-    onError: (error: any) => {
-      const errorText = error.response.data.msg
-        ? error.response.data.msg
-        : error.message;
-      alert(errorText);
-    },
-    onSuccess: (data)=>{
-      console.log(data);      
-      setUser(null);
-      Token.Remove();
+  const { mutate, isLoading, isSuccess } = useMutation(
+    authServises.deleteAccount,
+    {
+      onError: (error: any) => {
+        const errorText = error.response.data.msg
+          ? error.response.data.msg
+          : error.message;
+        alert(errorText);
+      },
+      onSuccess: () => {
+        setTimeout(() => {
+          setUser(null);
+          Token.Remove();
+        }, 700);
+      },
     }
-  });
+  );
 
   const handleOpenMenuClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -44,6 +49,7 @@ export const UserInfo = () => {
 
   const handleLogoutClick = useCallback(() => {
     setUser(null);
+    Token.Remove();
   }, []);
 
   const handleDeleteAccountClick = useCallback(() => {
@@ -83,7 +89,13 @@ export const UserInfo = () => {
         <MenuItem>Profile</MenuItem>
         <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
         <MenuItem onClick={handleDeleteAccountClick}>
-          {isLoading ? <CircularProgress size={20} /> : null} Delete account
+          {isSuccess ? (
+            <Alert color={"success"}>Account deleted success</Alert>
+          ) : isLoading ? (
+            <CircularProgress size={20} />
+          ) : (
+            "Delete account"
+          )}
         </MenuItem>
       </Menu>
     </>

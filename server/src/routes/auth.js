@@ -86,7 +86,6 @@ router.post('/login', async (req, res) => {
 router.get('/auth', authMiddleware, async (req, res) => {
     try {
         const { id } = req.user;
-        console.log(req.user);
         const user = await User.findOne({ _id: id });
 
         const token = generateAccessTocken(user._id, user.roles);
@@ -107,52 +106,65 @@ router.get('/auth', authMiddleware, async (req, res) => {
     }
 })
 
-router.delete('/user', authMiddleware, async(req,res)=>{
-    try{
+router.delete('/user', authMiddleware, async (req, res) => {
+    try {
         const { id, roles } = req.user;
         console.warn("Delete user", req.user);
 
-        if(roles.some((role)=>role === "ADMIN")){
+        if (roles.some((role) => role === "ADMIN")) {
             console.log("Cannot delete ADMIN account");
-            return res.status(400).send({ msg: "Cannot delete ADMIN account"});
+            return res.status(400).send({ msg: "Cannot delete ADMIN account" });
         }
 
-        const { acknowledged } = await User.deleteOne({_id: id})
-        
-        if(!acknowledged) {
-            res.status(400).send({ msg: "Cannot delete account"});
+        const { acknowledged } = await User.deleteOne({ _id: id })
+
+        if (!acknowledged) {
+            res.status(400).send({ msg: "Cannot delete account" });
         }
         else {
-            res.status(202).send({msg: "deleted complete"});
+            res.status(202).send({ msg: "deleted complete" });
         }
-        
-    }catch(e){
+
+    } catch (e) {
         console.log(e);
-        res.status(500).send({msg: "Server error"})
+        res.status(500).send({ msg: "Server error" })
     }
 })
 
-router.get('/users', roleMiddleware(["ADMIN"]), async (req, res) => {
+router.get('/search', authMiddleware, async (req, res) => {
     try {
-        const users = await User.find();
+        const { username } = req.query;
+        const users = await User.find(
+            {
+                username: {
+                    "$regex": username,
+                    '$options': 'i',
+                }
+            }).select('username avatarUrl email');
+
         res.status(200).send(users);
     } catch (e) {
-        console.error(e);
-        res.status(500).send({ msg: "Server error" })
+        console.log(e);
+        res.status(500).send({ msg: "Server error" });
     }
 });
 
-router.get("/user", roleMiddleware(["ADMIN"]), async (req, res) => {
+router.get("/user/:id", async (req, res) => {
     try {
-        const { id } = req.query;
-        const user = await User.findOne({ _id: id });
-        const roles = await Roles.find(user.roles);
-        console.log(roles);
-        res.status(200).send(user);
+        const { id } = req.params;
+
+        const user = User.findOne({ _id: id }).select('username avatarUrl email createdAt');
+    
+        if (!user) {
+            res.status(404).send({ msg: "Not found" })
+        }
+        
+        res.status(302).send(user);
+        
     } catch (e) {
-        console.error(e);
-        res.status(500).send({ msg: "Server error" });
+        console.log(e);
+        res.status(500).send({ msg: "Server error" })
     }
-})
+});
 
 module.exports = router;

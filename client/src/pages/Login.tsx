@@ -149,6 +149,7 @@ const styles = {
     margin: "5px",
   },
   inputPassword: {
+    margin: "10px 0 0 0",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
