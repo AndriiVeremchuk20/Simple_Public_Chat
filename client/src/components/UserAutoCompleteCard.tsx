@@ -1,5 +1,6 @@
 import { Avatar, Box, Typography } from "@mui/material";
-import React from "react";
+import React, { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { User } from "../types/User";
 
 
@@ -8,24 +9,33 @@ import { User } from "../types/User";
 //if into id (query param) id curren user, redirect to your page  
 
 interface UserAutoCompleteCardProps {
-  user: Omit<User, "password" | "id"| "createdAt">;
+  user: User;
 }
 
 export const UserAutoCompleteCatd: React.FC<UserAutoCompleteCardProps> = ({
   user,
 }) => {
 
+  const navigate = useNavigate();
 
+  const onCardClick = useCallback(()=>{
+    navigate(`profile/${user._id}`);
+  },[]);
 
   return (
     <Box
+      
       sx={{
         display: "flex",
         flexDirection: "row",
         width: "auto",
         padding: "5px 10px",
         alignItems: "center",
+        "&:hover":{
+          background: "#8a8a8a",
+        }
       }}
+      onClick={onCardClick}
     >
       <Avatar
         alt={user.username}

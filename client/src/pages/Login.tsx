@@ -68,7 +68,7 @@ export const Login = () => {
       ...data,
     };
     mutate(user);
-  }, [mutate]);
+  }, []);
 
   const onButtonClick = useCallback(() => {
     setShowPassword((prev) => !prev);

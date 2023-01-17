@@ -9,27 +9,12 @@ import { Token } from "../utils/token";
 export const Home = () => {
   const [user, setUser] = useAtom(appUserAtom);
 
-  const onLogoutClick = useCallback(() => {
-    setUser(null);
-    Token.Remove();
-    console.log(user, "Logout Complete");
-  }, []);
-
   return (
-    <Paper sx={styles.main}>
-      <SearchBar/>
-      
-      <MakePost />
+    <Paper sx={{ height: "100vh", width: "100vw", display: "flex", justifyContent: "center"}}>
+      <SearchBar />
+      <Paper elevation={3} sx={{ height: "100vh", width: "60vw" }}>
+        <MakePost />
+      </Paper>
     </Paper>
   );
-};
-
-const styles = {
-  main: {
-    height: "100vh",
-    width: "100vw",
-    // display: "flex",
-    // justifyContent: "center",
-    // alignItems: "center",
-  },
 };

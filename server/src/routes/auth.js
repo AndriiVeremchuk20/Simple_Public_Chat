@@ -6,7 +6,7 @@ const User = require('../database/schemas/User');
 const Roles = require('../database/schemas/Roles');
 const { secret } = require('../config');
 const authMiddleware = require('../middleware/authMiddleware');
-const roleMiddleware = require('../middleware/roleMiddleware');
+//const roleMiddleware = require('../middleware/roleMiddleware');
 const router = Router();
 
 const generateAccessTocken = (id, roles) => {
@@ -67,7 +67,7 @@ router.post('/login', async (req, res) => {
             res.status(201).send({
                 token,
                 user: {
-                    id: user._id,
+                    _id: user._id,
                     username: user.username,
                     email: user.email,
                     createdAT: user.createdAT,
@@ -92,7 +92,7 @@ router.get('/auth', authMiddleware, async (req, res) => {
         res.status(201).send({
             token,
             user: {
-                id: user._id,
+                _id: user._id,
                 username: user.username,
                 email: user.email,
                 createdAT: user.createdAT,
@@ -133,33 +133,39 @@ router.delete('/user', authMiddleware, async (req, res) => {
 
 router.get('/search', authMiddleware, async (req, res) => {
     try {
+        const currentUser = req.user;
+        console.log(currentUser.id);
         const { username } = req.query;
         const users = await User.find(
             {
                 username: {
                     "$regex": username,
                     '$options': 'i',
-                }
+                },
             }).select('username avatarUrl email');
 
-        res.status(200).send(users);
+        console.log(users);
+        const usersWithoudCurrentUser = users;
+        console.log(usersWithoudCurrentUser);
+        res.status(200).send(usersWithoudCurrentUser);
     } catch (e) {
         console.log(e);
         res.status(500).send({ msg: "Server error" });
     }
 });
 
-router.get("/user/:id", async (req, res) => {
+router.get("/user/:id", authMiddleware, async (req, res) => {
+    
     try {
-        const { id } = req.params;
-
-        const user = User.findOne({ _id: id }).select('username avatarUrl email createdAt');
+        const {id} = req.params;
+        
+        const user = await User.findOne({ _id: id }).select('username avatarUrl email createdAt');
     
         if (!user) {
-            res.status(404).send({ msg: "Not found" })
+             res.status(404).send({ msg: "Not found" })
         }
-        
-        res.status(302).send(user);
+
+        res.status(200).send(user);
         
     } catch (e) {
         console.log(e);

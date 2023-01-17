@@ -10,13 +10,16 @@ import {
 import { useAtom } from "jotai";
 import React, { useCallback, useState } from "react";
 import { useMutation } from "react-query";
+import { useNavigate } from "react-router-dom";
 import { appUserAtom } from "../atom";
+import { AppRoutes } from "../routes";
 import { authServises } from "../servises/API";
 import { Token } from "../utils/token";
 
 export const UserInfo = () => {
   const [anchorMenu, setAnchorMenu] = useState<null | HTMLElement>(null);
   const [user, setUser] = useAtom(appUserAtom);
+  const navigate = useNavigate();
 
   const { mutate, isLoading, isSuccess } = useMutation(
     authServises.deleteAccount,
@@ -56,27 +59,29 @@ export const UserInfo = () => {
     mutate();
   }, []);
 
+  const handleProfileClick = useCallback(() => {
+    navigate(AppRoutes.profile);
+  }, []);
+
   return (
     <>
       <Button
         sx={{
-          width: "auto",
+          width: "15%",
           display: "flex",
           flexDirection: "row",
-          justifyContent: "space-between",
+          justifyContent: "left",
           alignItems: "center",
           margin: "0 10px",
         }}
         onClick={handleOpenMenuClick}
       >
-        <Typography variant="h5" mr={2}>
-          {user?.username}
-        </Typography>
         <Avatar
           alt={user?.username}
           src={user?.avatarUrl ?? ""}
-          sx={{ width: "56", height: "56" }}
+          sx={{ width: "56", height: "56", margin: "0 10px 0 10px" }}
         />
+        <Typography variant="h5">{user?.username}</Typography>
       </Button>
 
       <Menu
@@ -86,7 +91,7 @@ export const UserInfo = () => {
         open={Boolean(anchorMenu)}
         onClose={handleCloseMenu}
       >
-        <MenuItem>Profile</MenuItem>
+        <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
         <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
         <MenuItem onClick={handleDeleteAccountClick}>
           {isSuccess ? (

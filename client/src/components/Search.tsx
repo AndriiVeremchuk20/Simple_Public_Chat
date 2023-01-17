@@ -39,7 +39,7 @@ export const Search = () => {
   }, [debouce]);
 
   return (
-    <Box width={"70%"} mx={3} my={1}>
+    <Box width={"60%"} mx={3} my={1}>
       <Autocomplete
         autoHighlight
         limitTags={3}

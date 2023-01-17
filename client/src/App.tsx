@@ -1,4 +1,4 @@
-import { Alert } from "@mui/material";
+import { Alert, Switch } from "@mui/material";
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { useMutation } from "react-query";
@@ -7,6 +7,7 @@ import { appUserAtom } from "./atom";
 import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { NoPage } from "./pages/NoPage";
+import { Profile } from "./pages/Profile";
 import { Registration } from "./pages/Registration";
 import { WaitPage } from "./pages/WaitPage";
 import { AppRoutes } from "./routes";
@@ -18,26 +19,22 @@ export const App = () => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [user, setUser] = useAtom(appUserAtom);
 
-  const { mutate, isLoading, isSuccess } = useMutation(
-    authServises.auth,
-    {
-      onSuccess: (data) => {
-        setUser(data.user);
-      },
-      onError: (error: any) => {
-        const errorText = error.response.data.msg
-          ? error.response.data.msg
-          : error.message;
-        setErrorMessage(errorText);
-        Token.Remove();
-      },
-    }
-  );
+  const { mutate, isLoading, isSuccess } = useMutation(authServises.auth, {
+    onSuccess: (data) => {
+      setUser(data.user);
+    },
+    onError: (error: any) => {
+      const errorText = error.response.data.msg
+        ? error.response.data.msg
+        : error.message;
+      setErrorMessage(errorText);
+      Token.Remove();
+    },
+  });
 
   useEffect(() => {
     mutate();
   }, []);
-
 
   // if (isError) {
   //   return <Alert variant="filled" severity="error">
@@ -48,25 +45,19 @@ export const App = () => {
   if (isLoading) {
     return <WaitPage />;
   }
-  
+
   return (
     <BrowserRouter>
       <Routes>
         {isSuccess && user ? (
-          <Route
-            index
-            path={AppRoutes.home}
-            element={
-              <PrivateRoute
-                redirectPath={AppRoutes.login}
-                user={user}
-                children={<Home />}
-              />
-            }
-          ></Route>
+          <>
+            <Route index path={AppRoutes.home} element={<Home />} />
+            <Route path={AppRoutes.profile} element={<Profile />} />
+            <Route path={AppRoutes.profileId} element={<Profile />} />
+          </>
         ) : (
           <>
-            <Route index path={AppRoutes.login} element={<Login />} />
+            <Route path={AppRoutes.login} element={<Login />} />
             <Route path={AppRoutes.registration} element={<Registration />} />
           </>
         )}

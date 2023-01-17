@@ -58,7 +58,7 @@ const searchUsers = async (searchText: string) => {
 
 const getUserInfo = async (userID: string) => {
   const token = Token.Get();
-  const response = await client.get<User>(`auth/user${userID}`, {
+  const response = await client.get<User>(`auth/user/${userID}`, {
     headers: { Authorization: token },
   });
   return response.data;

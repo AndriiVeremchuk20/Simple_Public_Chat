@@ -11,19 +11,21 @@ export interface LoginUser {
 }
 
 export interface User {
-  id: string;
+  _id: string;
   username: string;
   email: string;
   avatarUrl: string | null;
   createdAt: Date;
 }
 
-export type responseSearchType = Array<{
-  username: string;
-  email: string;
-  avatarUrl: string | null;
-  _id: string;
-}>;
+// export type responseSearchType = {
+//   username: string;
+//   email: string;
+//   avatarUrl: string | null;
+//   _id: string;
+// } 
+
+export type responseSearchType = Array<User>;
 
 // data example
 /*

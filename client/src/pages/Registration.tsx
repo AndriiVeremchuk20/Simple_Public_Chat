@@ -46,7 +46,7 @@ export const Registration = () => {
       ...data
     }
     mutate(newUser)
-  }, [mutate]);
+  }, []);
 
   const onButtonClick = useCallback(() => {
     setShowPassword((prev) => !prev)
