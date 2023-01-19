@@ -1,10 +1,21 @@
-const { Schema, SchemaTypes, model } = require('mongoose');
+import { User } from "./User";
 
-const UserPostShema = Schema({
-    user:{
-        type: {},
+export interface PostRequestBody {
+    text: string,
+}
+
+export interface PostResponseData {
+    _id: string,
+    user: User,
+    text: string,
+    likes: number,
+    createdAt: Date,
+}
+
+/*
+    userId:{
+        type: SchemaTypes.String,
         required: true,
-        ref: 'user',
     },
     text:{
         type: SchemaTypes.String,
@@ -20,6 +31,4 @@ const UserPostShema = Schema({
         required: true,
         default: new Date(),
     },
-});
-
-module.exports = model('posts', UserPostShema);
+*/

@@ -1,8 +1,7 @@
-import { Alert, Switch } from "@mui/material";
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { useMutation } from "react-query";
-import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { appUserAtom } from "./atom";
 import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
@@ -11,15 +10,14 @@ import { Profile } from "./pages/Profile";
 import { Registration } from "./pages/Registration";
 import { WaitPage } from "./pages/WaitPage";
 import { AppRoutes } from "./routes";
-import { authServises } from "./servises/API";
-import { PrivateRoute } from "./utils/PrivateRoute";
+import { AppServises } from "./servises/API";
 import { Token } from "./utils/token";
 
 export const App = () => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [user, setUser] = useAtom(appUserAtom);
 
-  const { mutate, isLoading, isSuccess } = useMutation(authServises.auth, {
+  const { mutate, isLoading, isSuccess } = useMutation(AppServises.auth, {
     onSuccess: (data) => {
       setUser(data.user);
     },

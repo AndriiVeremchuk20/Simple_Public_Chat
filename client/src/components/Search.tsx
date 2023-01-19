@@ -2,7 +2,7 @@ import { Autocomplete, Box, TextField } from "@mui/material";
 import React, { useEffect, useState, useCallback } from "react";
 import { useMutation } from "react-query";
 import { useDebounce } from "../hooks/useDebounce";
-import { authServises } from "../servises/API";
+import { AppServises } from "../servises/API";
 import { responseSearchType } from "../types/User";
 import { UserAutoCompleteCatd } from "./UserAutoCompleteCard";
 
@@ -20,7 +20,7 @@ export const Search = () => {
   const debouce = useDebounce<string>(searchText, delay);
 
   const { mutate, isLoading, isSuccess, isError } = useMutation(
-    authServises.searchUsers,
+    AppServises.searchUsers,
     {
       onSuccess: (data) => {
         console.log(data);

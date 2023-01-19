@@ -9,7 +9,7 @@ import {
 import { Box } from '@mui/system'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { useMutation } from 'react-query'
-import { authServises } from '../servises/API'
+import { AppServises } from '../servises/API'
 import { RegistrationUser } from '../types/User'
 import { Link, useNavigate } from 'react-router-dom'
 import { AppRoutes } from '../routes'
@@ -27,7 +27,7 @@ export const Registration = () => {
   })
 
   const { mutate, isLoading, isError} = useMutation(
-    authServises.register,
+    AppServises.register,
     {
       onSuccess: (data) => {
         navigate(AppRoutes.login)

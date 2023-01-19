@@ -13,7 +13,7 @@ import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { appUserAtom } from "../atom";
 import { AppRoutes } from "../routes";
-import { authServises } from "../servises/API";
+import { AppServises } from "../servises/API";
 import { Token } from "../utils/token";
 
 export const UserInfo = () => {
@@ -22,7 +22,7 @@ export const UserInfo = () => {
   const navigate = useNavigate();
 
   const { mutate, isLoading, isSuccess } = useMutation(
-    authServises.deleteAccount,
+    AppServises.deleteAccount,
     {
       onError: (error: any) => {
         const errorText = error.response.data.msg

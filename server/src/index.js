@@ -3,6 +3,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const authRoute = require('./routes/auth');
+const userPostRoute = require('./routes/post');
 const { PORT } = require('./config');
 
 require('./database')
@@ -28,5 +29,6 @@ app.use((req, res, next)=>{
 });
 
 app.use('/auth', authRoute);
+app.use('/posts', userPostRoute);
 
 app.listen(PORT, ()=> console.log(`listen port ${PORT}`));

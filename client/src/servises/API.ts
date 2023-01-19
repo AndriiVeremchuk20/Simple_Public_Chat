@@ -1,4 +1,5 @@
 import axios from "axios";
+import { PostRequestBody, PostResponseData } from "../types/Post";
 import { LoginUser, RegistrationUser, responseSearchType, User } from "../types/User";
 import { Token } from "../utils/token";
 
@@ -64,11 +65,33 @@ const getUserInfo = async (userID: string) => {
   return response.data;
 }
 
-export const authServises = {
+const makePost = async (postBody: PostRequestBody) => {
+  const token = Token.Get();
+  const response = await client.post<any>("posts/new", postBody, 
+  {
+    headers: { Authorization: token },
+  }
+  );
+  return response.data;
+}
+
+const getPosts = async () => {
+  const token = Token.Get();
+  const response = await client.get<Array<PostResponseData>>("posts/", 
+  {
+    headers: { Authorization: token },
+  });
+
+  return response.data;
+}
+
+export const AppServises = {
   register,
   login,
   auth,
   deleteAccount,
   searchUsers,
   getUserInfo,
+  makePost,
+  getPosts,
 };

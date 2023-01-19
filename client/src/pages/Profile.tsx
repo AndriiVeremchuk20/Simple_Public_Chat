@@ -1,10 +1,10 @@
-import { AppBar, Avatar, Button, Card, CardContent, CardMedia, Paper, Typography } from "@mui/material";
+import { AppBar, Avatar, Button, Card, CardContent, Paper, Typography } from "@mui/material";
 import { useAtom } from "jotai";
 import React, { useCallback, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { appUserAtom } from "../atom";
-import { authServises } from "../servises/API";
+import { AppServises } from "../servises/API";
 import { User } from "../types/User";
 
 export const Profile = () => {
@@ -18,7 +18,7 @@ export const Profile = () => {
     navigate(-1);
   }, []);
 
-  const { mutate } = useMutation(authServises.getUserInfo, {
+  const { mutate } = useMutation(AppServises.getUserInfo, {
     onSuccess: (data) => {
       setCurrUser(data);
     },

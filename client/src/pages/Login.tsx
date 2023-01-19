@@ -12,7 +12,7 @@ import { useMutation } from "react-query";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
-import { authServises } from "../servises/API";
+import { AppServises } from "../servises/API";
 import { LoginUser, User } from "../types/User";
 import { Link, useNavigate } from "react-router-dom";
 import { AppRoutes } from "../routes";
@@ -46,7 +46,7 @@ export const Login = () => {
   });
 
   const { mutate, isLoading, isError } = useMutation(
-    authServises.login,
+    AppServises.login,
     {
       onSuccess: (data) => {
         setUser(data.user);
