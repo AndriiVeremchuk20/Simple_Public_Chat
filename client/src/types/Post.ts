@@ -6,10 +6,10 @@ export interface PostRequestBody {
 
 export interface PostResponseData {
     _id: string,
-    user: User,
+    postedBy: User,
     text: string,
     likes: number,
-    createdAt: Date,
+    createdAt: string,
 }
 
 /*

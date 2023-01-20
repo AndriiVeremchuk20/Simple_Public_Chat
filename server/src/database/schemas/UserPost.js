@@ -1,10 +1,9 @@
 const { Schema, SchemaTypes, model } = require('mongoose');
 
 const UserPostShema = Schema({
-    user:{
+    postedBy:{
         type: {},
         required: true,
-        ref: 'user',
     },
     text:{
         type: SchemaTypes.String,

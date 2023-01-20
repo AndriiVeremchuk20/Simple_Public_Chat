@@ -49,6 +49,9 @@ export const Search = () => {
         renderInput={(params) => (
           <TextField
             {...params}
+            sx={{
+              borderRadius: "5px"
+            }}
             value={searchText}
             onChange={onSearchTextChange}
             placeholder={"Search"}

@@ -60,14 +60,14 @@ export const UserInfo = () => {
   }, []);
 
   const handleProfileClick = useCallback(() => {
-    navigate(AppRoutes.profile);
+    navigate(`profile/${user?._id}`);
   }, []);
 
   return (
     <>
       <Button
         sx={{
-          width: "15%",
+          width: "8%",
           display: "flex",
           flexDirection: "row",
           justifyContent: "left",
@@ -81,7 +81,7 @@ export const UserInfo = () => {
           src={user?.avatarUrl ?? ""}
           sx={{ width: "56", height: "56", margin: "0 10px 0 10px" }}
         />
-        <Typography variant="h5">{user?.username}</Typography>
+        <Typography variant="h5" sx={{color: "white"}}>{user?.username}</Typography>
       </Button>
 
       <Menu

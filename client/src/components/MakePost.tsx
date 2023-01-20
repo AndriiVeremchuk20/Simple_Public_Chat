@@ -6,12 +6,15 @@ import {
   TextareaAutosize,
   Typography,
 } from "@mui/material";
+import { useAtom } from "jotai";
 import React, { useCallback, useState } from "react";
 import { useMutation } from "react-query";
+import { postsListAtom } from "../atom";
 import { AppServises } from "../servises/API";
 import { PostRequestBody } from "../types/Post";
 
 export const MakePost = () => {
+  const [,setPosts] = useAtom(postsListAtom);
   const [postText, setPostText] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
@@ -29,8 +32,9 @@ export const MakePost = () => {
       setTimeout(()=>{
         setShowSuccessMessage(false);
       }, 700);
-      setPostText("");
       console.log(data);
+      setPosts((posts) => [ data.post, ...posts]);
+      setPostText("");
     },
     onError: (error: any) => {
       const errorText = error.response.data.msg

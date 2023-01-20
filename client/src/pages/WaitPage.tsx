@@ -5,7 +5,6 @@ export const WaitPage = () => {
   return (
     <Paper
       sx={{
-        width: "100vw",
         height: "100vh",
         display: "flex",
         justifyContent: "center",

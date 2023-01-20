@@ -9,6 +9,3 @@ const RolesSchema = Schema({
 });
 
 module.exports = model('roles', RolesSchema);
-
-
-

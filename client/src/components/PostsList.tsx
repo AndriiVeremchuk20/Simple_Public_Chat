@@ -1,35 +1,23 @@
-import { List } from '@mui/material';
-import { useAtom } from 'jotai';
-import React, { useEffect } from 'react'
-import { useMutation } from 'react-query'
-import { postsListAtom } from '../atom';
-import { AppServises } from '../servises/API';
-import { PostCard } from './PostCard';
+import { List, Paper, Typography } from "@mui/material";
+import React from "react";
+import { PostResponseData } from "../types/Post";
+import { PostCard } from "./PostCard";
 
-export const PostsList = () => {
-
-    const [posts, setPosts] = useAtom(postsListAtom);
-
-    const {mutate, isLoading, isError} = useMutation(AppServises.getPosts, {
-        onSuccess: (data)=>{
-            console.log(data);
-            setPosts(data);
-        }, 
-        onError: (error: any)=>{
-            console.log(error);
-        }
-    });
-
-    useEffect(()=>{
-        mutate();
-    }, [])
-
-    return (
-        <List>
-
-            { !isLoading?
-                posts.map(post=><PostCard key={post._id} post={post}/>):null
-            }
-        </List>
-    )
+interface PostslistProps {
+  posts: Array<PostResponseData>;
+  redirect: boolean;
 }
+
+export const PostsList: React.FC<PostslistProps> = ({ posts, redirect}) => {
+  return (
+    <Paper elevation={2} sx={{ width: "80%", margin: "10px 0 0 0 " }}>
+      <List>
+        {posts ? (
+          posts.map((post) => <PostCard key={post._id} post={post} redirect={redirect} />)
+        ) : (
+          <Typography variant="h3">No posts found</Typography>
+        )}
+      </List>
+    </Paper>
+  );
+};

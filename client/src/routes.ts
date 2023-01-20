@@ -3,6 +3,5 @@ export const AppRoutes = {
   registration: 'registration',
   home: '/',
   noPage: '*',
-  profile: 'profile',
   profileId: "profile/:id",
 }

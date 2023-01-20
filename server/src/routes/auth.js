@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { hashPassword, comparePassword } = require('../utils/helpers');
 const User = require('../database/schemas/User');
 const Roles = require('../database/schemas/Roles');
+const UserPosts = require('../database/schemas/UserPost');
 const { secret } = require('../config');
 const authMiddleware = require('../middleware/authMiddleware');
 //const roleMiddleware = require('../middleware/roleMiddleware');
@@ -104,8 +105,9 @@ router.get('/auth', authMiddleware, async (req, res) => {
         console.error(e);
         res.status(403).send({ msg: "Server error" });
     }
-})
+});
 
+// delete all user data (likes, posts)//
 router.delete('/user', authMiddleware, async (req, res) => {
     try {
         const { id, roles } = req.user;
@@ -155,18 +157,22 @@ router.get('/search', authMiddleware, async (req, res) => {
 });
 
 router.get("/user/:id", authMiddleware, async (req, res) => {
-    
+
     try {
-        const {id} = req.params;
-        
+        const { id } = req.params;
+
         const user = await User.findOne({ _id: id }).select('username avatarUrl email createdAt');
-    
+        const userPosts = await UserPosts.find({ postedBy: user }).sort({ createdAt: -1 });
+
         if (!user) {
-             res.status(404).send({ msg: "Not found" })
+            res.status(404).send({ msg: "Not found" })
         }
 
-        res.status(200).send(user);
-        
+        res.status(200).send({
+            user: user,
+            posts: userPosts,
+        });
+
     } catch (e) {
         console.log(e);
         res.status(500).send({ msg: "Server error" })
