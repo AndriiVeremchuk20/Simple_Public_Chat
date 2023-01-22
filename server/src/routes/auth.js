@@ -5,6 +5,7 @@ const { hashPassword, comparePassword } = require('../utils/helpers');
 const User = require('../database/schemas/User');
 const Roles = require('../database/schemas/Roles');
 const UserPosts = require('../database/schemas/UserPost');
+const Likes = require('../database/schemas/Likes');
 const { secret } = require('../config');
 const authMiddleware = require('../middleware/authMiddleware');
 //const roleMiddleware = require('../middleware/roleMiddleware');
@@ -121,11 +122,10 @@ router.delete('/user', authMiddleware, async (req, res) => {
         const { acknowledged } = await User.deleteOne({ _id: id })
 
         if (!acknowledged) {
-            res.status(400).send({ msg: "Cannot delete account" });
+            return res.status(400).send({ msg: "Cannot delete account" });
         }
-        else {
-            res.status(202).send({ msg: "deleted complete" });
-        }
+
+        res.status(202).send({ msg: "deleted complete" });
 
     } catch (e) {
         console.log(e);
@@ -162,15 +162,20 @@ router.get("/user/:id", authMiddleware, async (req, res) => {
         const { id } = req.params;
 
         const user = await User.findOne({ _id: id }).select('username avatarUrl email createdAt');
-        const userPosts = await UserPosts.find({ postedBy: user }).sort({ createdAt: -1 });
 
         if (!user) {
-            res.status(404).send({ msg: "Not found" })
+            return res.status(404).send({ msg: "Not found" })
         }
+        
+        let userPosts = await UserPosts.find({ postedBy: user }).sort({ createdAt: -1 });
+        userPosts = userPosts.map((post) => { post.postedBy = user; return post });
+        
+        const likes = await Likes.find({});
 
         res.status(200).send({
             user: user,
             posts: userPosts,
+            likes: likes,
         });
 
     } catch (e) {

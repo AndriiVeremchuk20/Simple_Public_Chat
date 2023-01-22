@@ -1,3 +1,4 @@
+import { CheckCircle } from "@mui/icons-material";
 import {
   Alert,
   Button,
@@ -17,8 +18,7 @@ export const MakePost = () => {
   const [,setPosts] = useAtom(postsListAtom);
   const [postText, setPostText] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
-
+  
   const onInput = useCallback(
     (e: { target: { value: string } }) => {
       setPostText(e.target.value);
@@ -26,14 +26,10 @@ export const MakePost = () => {
     [postText]
   );
 
-  const { mutate, isError, isLoading } = useMutation(AppServises.makePost, {
+  const { mutate, isError, isLoading, isSuccess } = useMutation(AppServises.makePost, {
     onSuccess: (data) => {
-      setShowSuccessMessage(true);
-      setTimeout(()=>{
-        setShowSuccessMessage(false);
-      }, 700);
       console.log(data);
-      setPosts((posts) => [ data.post, ...posts]);
+      setPosts((posts) => [ data, ...posts]);
       setPostText("");
     },
     onError: (error: any) => {
@@ -64,7 +60,6 @@ export const MakePost = () => {
         padding: "10px",
       }}
     >
-      {showSuccessMessage ? <Alert color="success">Post created</Alert> : null}
 
       <Typography variant="h5">Type your post 📝</Typography>
       <TextareaAutosize
@@ -89,6 +84,7 @@ export const MakePost = () => {
         variant="contained"
         onClick={onPostClick}
       >
+        {isSuccess? <CheckCircle sx={{with: "20px", height: "20px", color: "green"}}/> : null}
         {isLoading ? <CircularProgress size={15} /> : "Post"}
       </Button>
       {isError ? <Alert color="error">{errorMessage}</Alert> : null}

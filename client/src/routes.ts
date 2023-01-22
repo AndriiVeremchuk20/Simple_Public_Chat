@@ -4,4 +4,5 @@ export const AppRoutes = {
   home: '/',
   noPage: '*',
   profileId: "profile/:id",
+  profile: "profile",
 }

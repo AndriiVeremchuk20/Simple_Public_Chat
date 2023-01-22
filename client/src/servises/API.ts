@@ -1,5 +1,5 @@
 import axios from "axios";
-import { PostRequestBody, PostResponseData } from "../types/Post";
+import { Like, LikeRequestBody, Post, PostRequestBody, PostResponseData } from "../types/Post";
 import { LoginUser, RegistrationUser, responseSearchType, User } from "../types/User";
 import { Token } from "../utils/token";
 
@@ -59,7 +59,7 @@ const searchUsers = async (searchText: string) => {
 
 const getUserInfo = async (userID: string) => {
   const token = Token.Get();
-  const response = await client.get<{user: User, posts: Array<PostResponseData>}>(`auth/user/${userID}`, {
+  const response = await client.get<{user: User, posts: Array<Post>, likes:Array<Like>}>(`auth/user/${userID}`, {
     headers: { Authorization: token },
   });
   return response.data;
@@ -67,7 +67,7 @@ const getUserInfo = async (userID: string) => {
 
 const makePost = async (postBody: PostRequestBody) => {
   const token = Token.Get();
-  const response = await client.post<any>("posts/new", postBody, 
+  const response = await client.post<Post>("posts/post", postBody, 
   {
     headers: { Authorization: token },
   }
@@ -77,12 +77,45 @@ const makePost = async (postBody: PostRequestBody) => {
 
 const getPosts = async () => {
   const token = Token.Get();
-  const response = await client.get<Array<PostResponseData>>("posts/", 
+  const response = await client.get<PostResponseData>("posts/",
   {
     headers: { Authorization: token },
   });
 
   return response.data;
+}
+
+const deletePost = async (id: string) => {
+  const token = Token.Get();
+  const response = await client.delete<PostResponseData>(`posts/post/${id}`, 
+  {
+    headers: { Authorization: token },
+  });
+  
+  return response.data;  
+}
+
+const likeIt = async (postId: string) => {
+  const token = Token.Get();
+  const body: LikeRequestBody = {
+    postId: postId
+  }
+  const response = await client.post<Like>("posts/likePost",body, 
+  {
+    headers: { Authorization: token },
+  });
+  
+  return response.data;
+}
+
+const removeLike = async (postId: string) => {
+  const token = Token.Get();
+  const response = await client.delete<any>(`posts/likePost/${postId}`, 
+  {
+    headers: { Authorization: token },
+  });
+  
+  return response.data; 
 }
 
 export const AppServises = {
@@ -94,4 +127,7 @@ export const AppServises = {
   getUserInfo,
   makePost,
   getPosts,
+  deletePost,
+  likeIt,
+  removeLike,
 };

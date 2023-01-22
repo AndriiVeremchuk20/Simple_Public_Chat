@@ -11,41 +11,52 @@ import { useAtom } from "jotai";
 import React, { useCallback, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { appUserAtom } from "../atom";
+import { appUserAtom, likedListAtom, postsListAtom } from "../atom";
 import { ChangeTheme } from "../components/ChangeTheme";
 import { Footer } from "../components/Footer";
 import { PostsList } from "../components/PostsList";
 import { AppServises } from "../servises/API";
-import { PostResponseData } from "../types/Post";
 import { User } from "../types/User";
+import { WaitPage } from "./WaitPage";
 
 export const Profile = () => {
   const { id } = useParams();
-  const [user] = useAtom(appUserAtom);
-  const [currUser, setCurrUser] = useState<User | null>(null);
-  const [userPosts, setUserPosts] = useState<Array<PostResponseData>>([]);
+  const [currProfile, setCurrProfile] = useState<User | null>(null);
+  const [appUser] = useAtom(appUserAtom);
+  const [, setUserPosts] = useAtom(postsListAtom);
+  const [, setLikes] = useAtom(likedListAtom);
 
   const navigate = useNavigate();
+
+  const { mutate, isLoading } = useMutation(AppServises.getUserInfo, {
+    onSuccess: (data) => {
+      console.log(data);
+      setCurrProfile(data.user);
+      setUserPosts(data.posts);
+      setLikes(data.likes);
+    },
+    onError: (error: any) => {
+      console.log(error);
+    },
+  });
 
   const onBackClick = useCallback(() => {
     navigate(-1);
   }, []);
 
-  const { mutate } = useMutation(AppServises.getUserInfo, {
-    onSuccess: (data) => {
-      setCurrUser(data.user);
-      setUserPosts(data.posts);
-    },
-    onError: (error: any) => {},
-  });
-
   useEffect(() => {
     if (id) {
       mutate(id);
-    } else {
-      setCurrUser(user);
     }
+    else if(appUser){
+      mutate(appUser._id);
+    }
+
   }, []);
+
+  if (isLoading) {
+    return <WaitPage />;
+  }
 
   return (
     <Paper
@@ -54,16 +65,21 @@ export const Profile = () => {
         maxHeight: "auto",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",   
+        alignItems: "center",
       }}
     >
-      <AppBar sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
+      <AppBar
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
         <Button onClick={onBackClick} sx={{ margin: "10px" }}>
           Back
         </Button>
-        <ChangeTheme/>
+        <ChangeTheme />
       </AppBar>
-      {}
       <Paper
         elevation={3}
         sx={{
@@ -74,30 +90,28 @@ export const Profile = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center",
         }}
       >
-        <Card sx={{ width: "80%",margin: "10px 10px", padding: "10px 10px" }}>
+        <Card sx={{ width: "80%", margin: "10px 10px", padding: "10px 10px" }}>
           <Avatar
-            alt={currUser?.username}
-            src={currUser?.avatarUrl ?? ""}
+            alt={currProfile?.username}
+            src={currProfile?.avatarUrl ?? ""}
             sx={{ width: "300px", height: "300px" }}
           />
           <CardContent>
-            <Typography variant={"h4"}>{currUser?.username}</Typography>
+            <Typography variant={"h4"}>{currProfile?.username}</Typography>
             <Typography
               variant={"body1"}
               component={"a"}
-              href={`mailto:${currUser?.email}`}
+              href={`mailto:${currProfile?.email}`}
             >
-              {currUser?.email}
+              {currProfile?.email}
             </Typography>
           </CardContent>
         </Card>
-
-        <PostsList posts={userPosts} redirect={false}/>
+        <PostsList redirect={false} isRemovable={appUser?._id===currProfile?._id} />
       </Paper>
-    <Footer/>
+      <Footer />
     </Paper>
   );
 };

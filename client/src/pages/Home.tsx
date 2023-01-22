@@ -1,25 +1,25 @@
-import { Button, Paper } from "@mui/material";
+import { Paper } from "@mui/material";
 import { useAtom } from "jotai";
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useMutation } from "react-query";
-import { appUserAtom, postsListAtom } from "../atom";
+import { likedListAtom, postsListAtom } from "../atom";
 import { Footer } from "../components/Footer";
 import { MakePost } from "../components/MakePost";
 import { PostsList } from "../components/PostsList";
 import { SearchBar } from "../components/SearchBar";
 import { UpButton } from "../components/UpButton";
 import { AppServises } from "../servises/API";
-import { Token } from "../utils/token";
+import { WaitPage } from "./WaitPage";
 
 export const Home = () => {
-  const [user, setUser] = useAtom(appUserAtom);
-
-  const [posts, setPosts] = useAtom(postsListAtom);
-
+  const [, setPosts] = useAtom(postsListAtom);
+  const [, setLikes] = useAtom(likedListAtom);
+  
   const { mutate, isLoading, isError } = useMutation(AppServises.getPosts, {
     onSuccess: (data) => {
       console.log(data);
-      setPosts(data);
+      setPosts(data.posts);
+      setLikes(data.likes);
     },
     onError: (error: any) => {
       console.log(error);
@@ -29,6 +29,10 @@ export const Home = () => {
   useEffect(() => {
     mutate();
   }, []);
+
+  if(isLoading){
+    return <WaitPage/>
+  }
 
   return (
     <Paper
@@ -56,7 +60,7 @@ export const Home = () => {
         }}
       >
         <MakePost />
-        <PostsList posts={posts} redirect={true}/>
+        <PostsList redirect={true} isRemovable={false}/>
       </Paper>
       <UpButton/>
       <Footer/>

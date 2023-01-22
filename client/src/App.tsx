@@ -62,6 +62,7 @@ export const App = () => {
               <>
                 <Route index path={AppRoutes.home} element={<Home />} />
                 <Route path={AppRoutes.profileId} element={<Profile />} />
+                <Route path={AppRoutes.profile} element={<Profile/>}/>
               </>
             ) : (
               <>

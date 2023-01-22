@@ -60,7 +60,7 @@ export const UserInfo = () => {
   }, []);
 
   const handleProfileClick = useCallback(() => {
-    navigate(`profile/${user?._id}`);
+    navigate(AppRoutes.profile);
   }, []);
 
   return (
