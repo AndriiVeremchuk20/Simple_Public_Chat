@@ -15,9 +15,8 @@ export const Home = () => {
   const [, setPosts] = useAtom(postsListAtom);
   const [, setLikes] = useAtom(likedListAtom);
   
-  const { mutate, isLoading, isError } = useMutation(AppServises.getPosts, {
+  const { mutate, isLoading } = useMutation(AppServises.getPosts, {
     onSuccess: (data) => {
-      console.log(data);
       setPosts(data.posts);
       setLikes(data.likes);
     },

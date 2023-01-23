@@ -135,8 +135,7 @@ router.delete('/user', authMiddleware, async (req, res) => {
 
 router.get('/search', authMiddleware, async (req, res) => {
     try {
-        const currentUser = req.user;
-        console.log(currentUser.id);
+        const { id } = req.user;
         const { username } = req.query;
         const users = await User.find(
             {
@@ -144,12 +143,10 @@ router.get('/search', authMiddleware, async (req, res) => {
                     "$regex": username,
                     '$options': 'i',
                 },
-            }).select('username avatarUrl email');
+            }).select('username avatarUrl email roles');
 
-        console.log(users);
-        const usersWithoudCurrentUser = users;
-        console.log(usersWithoudCurrentUser);
-        res.status(200).send(usersWithoudCurrentUser);
+        const usersWithoudAdmin = users.filter((user) => !user.roles.some((role) => role === "ADMIN"));
+        res.status(200).send(usersWithoudAdmin);
     } catch (e) {
         console.log(e);
         res.status(500).send({ msg: "Server error" });
@@ -166,10 +163,10 @@ router.get("/user/:id", authMiddleware, async (req, res) => {
         if (!user) {
             return res.status(404).send({ msg: "Not found" })
         }
-        
+
         let userPosts = await UserPosts.find({ postedBy: user }).sort({ createdAt: -1 });
         userPosts = userPosts.map((post) => { post.postedBy = user; return post });
-        
+
         const likes = await Likes.find({});
 
         res.status(200).send({

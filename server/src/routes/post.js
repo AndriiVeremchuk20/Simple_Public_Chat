@@ -10,8 +10,8 @@ const router = Router();
 router.get('/', authMiddleware, async (req, res) => {
     try {
         let posts = await Posts.find({}).sort({ createdAt: -1 });
-        
-        posts = await Promise.all(posts.map( async (post) => {
+
+        posts = await Promise.all(posts.map(async (post) => {
             const user = await Users.findOne({ _id: post.postedBy }).select('username avatarUrl email createdAt');
             post.postedBy = user;
             return post;
@@ -49,22 +49,20 @@ router.post('/post', authMiddleware, async (req, res) => {
     }
 });
 
-
-//...........
 router.delete('/post/:id', authMiddleware, async (req, res) => {
     try {
         const userId = req.user.id;
         const postId = req.params.id;
 
-        const user = await Users.findOne({ _id: userId });
+        const deletedLikes = await Likes.deleteMany({ post: postId });
+        const deletedPost = await Posts.deleteOne({ $and: [{ _id: postId }, { postedBy: userId }] });
+        
+        if(deletedLikes.acknowledged&&deletedLikes.acknowledged){
+          return res.status(202).send({msg: "Deleted complete", post: postId});
+        }
 
-        const P = await Posts.findOne({ postedBy: user });
-        //const deletedPost = await Posts.deleteOne({ _id: postId ,  postedBy: userId});
-        //const deletedLikes = await Likes.updateMany({ post: postId });
+        res.status(400).send({msg: "cannot delete post"});
 
-        //console.log(deletedPost)
-
-        res.status(202).send({ msg: "deleted Complete" });
 
     } catch (e) {
         console.log(e);

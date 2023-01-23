@@ -20,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation } from "react-query";
 import { AppServises } from "../servises/API";
 import { useAtom } from "jotai";
-import { appUserAtom, likedListAtom } from "../atom";
+import { appUserAtom, likedListAtom, postsListAtom } from "../atom";
 import { isLiked, numLikes } from "../utils/likesInfo";
 import { Delete } from "@mui/icons-material";
 import { AppRoutes } from "../routes";
@@ -38,6 +38,7 @@ export const PostCard: React.FC<PostCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const [likes, setLikes] = useAtom(likedListAtom);
+  const [,setPosts] = useAtom(postsListAtom);
   const [user] = useAtom(appUserAtom);
   const [numOfLikes, setNumOfLikes] = useState<number>(
     numLikes(post._id, likes)
@@ -49,20 +50,23 @@ export const PostCard: React.FC<PostCardProps> = ({
 
   const likeMutation = useMutation(AppServises.likeIt, {
     onSuccess: (data) => {
-      console.log(data);
       setLikes((state) => [data, ...state]);
     },
+    onError: (error: any)=>{
+      console.log(error);
+    }
   });
 
   const removeLikeMutation = useMutation(AppServises.removeLike, {
-    onSuccess: (data) => {
-      console.log(data);
-    },
+    onError: (error: any)=>{
+      console.log(error);
+    }
   });
 
   const removePostMutation = useMutation(AppServises.deletePost, {
     onSuccess: (data) => {
-      console.log(data);
+      setLikes((likes) => likes.filter((like) => like.post !== data.post));
+      setPosts((posts) => posts.filter((post)=>post._id!==data.post));
     },
     onError: (error: any) => {
       console.log(error);

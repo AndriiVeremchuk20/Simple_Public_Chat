@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Like, LikeRequestBody, Post, PostRequestBody, PostResponseData } from "../types/Post";
+import { Subscribe } from "../types/Subscribe";
 import { LoginUser, RegistrationUser, responseSearchType, User } from "../types/User";
 import { Token } from "../utils/token";
 
@@ -87,7 +88,7 @@ const getPosts = async () => {
 
 const deletePost = async (id: string) => {
   const token = Token.Get();
-  const response = await client.delete<PostResponseData>(`posts/post/${id}`, 
+  const response = await client.delete<any>(`posts/post/${id}`, 
   {
     headers: { Authorization: token },
   });
@@ -118,6 +119,16 @@ const removeLike = async (postId: string) => {
   return response.data; 
 }
 
+const subscribeTo =async (id:string) => {
+  const token = Token.Get();
+  const response = await client.post<Subscribe>(`subscribe/${id}`, 
+  {
+    headers: { Authorization: token },
+  });
+  
+  return response.data; 
+}
+
 export const AppServises = {
   register,
   login,
@@ -130,4 +141,5 @@ export const AppServises = {
   deletePost,
   likeIt,
   removeLike,
+  subscribeTo,
 };

@@ -6,7 +6,7 @@ import { AppServises } from "../servises/API";
 import { responseSearchType } from "../types/User";
 import { UserAutoCompleteCatd } from "./UserAutoCompleteCard";
 
-const delay = 300; //delay for search
+const delay = 300; //wait defore search
 
 export const Search = () => {
   const [users, setUsers] = useState<responseSearchType>([]);
@@ -19,15 +19,15 @@ export const Search = () => {
 
   const debouce = useDebounce<string>(searchText, delay);
 
-  const { mutate, isLoading, isSuccess, isError } = useMutation(
+  const { mutate } = useMutation(
     AppServises.searchUsers,
     {
       onSuccess: (data) => {
-        console.log(data);
         setUsers(data);
-        console.log(users);
       },
-      onError: (error: any) => {},
+      onError: (error: any) => {
+        console.log(error);
+      },
     }
   );
 
