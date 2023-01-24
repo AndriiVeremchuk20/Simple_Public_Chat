@@ -19,23 +19,18 @@ export const Search = () => {
 
   const debouce = useDebounce<string>(searchText, delay);
 
-  const { mutate } = useMutation(
-    AppServises.searchUsers,
-    {
-      onSuccess: (data) => {
-        setUsers(data);
-      },
-      onError: (error: any) => {
-        console.log(error);
-      },
-    }
-  );
+  const { mutate } = useMutation(AppServises.searchUsers, {
+    onSuccess: (data) => {
+      setUsers(data);
+    },
+    onError: (error: any) => {
+      console.log(error);
+    },
+  });
 
   useEffect(() => {
-    if (debouce) 
-      mutate(debouce);
-    else
-      setUsers([]);
+    if (debouce) mutate(debouce);
+    else setUsers([]);
   }, [debouce]);
 
   return (
@@ -44,13 +39,15 @@ export const Search = () => {
         autoHighlight
         limitTags={3}
         options={users}
-        getOptionLabel={(user)=>(user.username)}
-        renderOption={(props, user) => <UserAutoCompleteCatd key={user._id} user={user} />}
+        getOptionLabel={(user) => user.username}
+        renderOption={(props, user) => (
+          <UserAutoCompleteCatd key={user._id} user={user} />
+        )}
         renderInput={(params) => (
           <TextField
             {...params}
             sx={{
-              borderRadius: "5px"
+              borderRadius: "5px",
             }}
             value={searchText}
             onChange={onSearchTextChange}

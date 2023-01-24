@@ -1,4 +1,3 @@
-import { CheckCircle } from "@mui/icons-material";
 import {
   Alert,
   Button,
@@ -15,10 +14,10 @@ import { AppServises } from "../servises/API";
 import { PostRequestBody } from "../types/Post";
 
 export const MakePost = () => {
-  const [,setPosts] = useAtom(postsListAtom);
+  const [, setPosts] = useAtom(postsListAtom);
   const [postText, setPostText] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
-  
+
   const onInput = useCallback(
     (e: { target: { value: string } }) => {
       setPostText(e.target.value);
@@ -26,20 +25,23 @@ export const MakePost = () => {
     [postText]
   );
 
-  const { mutate, isError, isLoading, isSuccess } = useMutation(AppServises.makePost, {
-    onSuccess: (data) => {
-      console.log(data);
-      setPosts((posts) => [ data, ...posts]);
-      setPostText("");
-    },
-    onError: (error: any) => {
-      const errorText = error.response.data.msg
-        ? error.response.data.msg
-        : error.message;
-      setErrorMessage(errorText);
-      console.log(error);
-    },
-  });
+  const { mutate, isError, isLoading, isSuccess } = useMutation(
+    AppServises.makePost,
+    {
+      onSuccess: (data) => {
+        console.log(data);
+        setPosts((posts) => [data, ...posts]);
+        setPostText("");
+      },
+      onError: (error: any) => {
+        const errorText = error.response.data.msg
+          ? error.response.data.msg
+          : error.message;
+        setErrorMessage(errorText);
+        console.log(error);
+      },
+    }
+  );
 
   const onPostClick = useCallback(() => {
     const requestBody: PostRequestBody = {
@@ -60,7 +62,6 @@ export const MakePost = () => {
         padding: "10px",
       }}
     >
-
       <Typography variant="h5">Type your post 📝</Typography>
       <TextareaAutosize
         onChange={onInput}
@@ -84,7 +85,6 @@ export const MakePost = () => {
         variant="contained"
         onClick={onPostClick}
       >
-        {isSuccess? <CheckCircle sx={{with: "20px", height: "20px", color: "green"}}/> : null}
         {isLoading ? <CircularProgress size={15} /> : "Post"}
       </Button>
       {isError ? <Alert color="error">{errorMessage}</Alert> : null}

@@ -5,9 +5,6 @@ export const chekSubscribed = (
   to: string,
   followersList: Array<Subscribe>
 ): boolean => {
-
-  //console.log( "data"  + appUserId, UserToChekId, followersList)
-
   return followersList.some(
     (follow) => follow.subscribed === subscribed && follow.to === to
   );

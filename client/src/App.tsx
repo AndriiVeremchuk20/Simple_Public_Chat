@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { appUserAtom, darkModeAtom } from "./atom";
-import { Footer } from "./components/Footer";
 import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { NoPage } from "./pages/NoPage";
@@ -43,12 +42,6 @@ export const App = () => {
     mutate();
   }, []);
 
-  // if (isError) {
-  //   return <Alert variant="filled" severity="error">
-  //     Error: {errorMessage}
-  //   </Alert>;
-  // }
-
   if (isLoading) {
     return <WaitPage />;
   }
@@ -62,7 +55,7 @@ export const App = () => {
               <>
                 <Route index path={AppRoutes.home} element={<Home />} />
                 <Route path={AppRoutes.profileId} element={<Profile />} />
-                <Route path={AppRoutes.profile} element={<Profile/>}/>
+                <Route path={AppRoutes.profile} element={<Profile />} />
               </>
             ) : (
               <>

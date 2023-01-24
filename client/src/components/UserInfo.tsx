@@ -81,7 +81,9 @@ export const UserInfo = () => {
           src={user?.avatarUrl ?? ""}
           sx={{ width: "56", height: "56", margin: "0 10px 0 10px" }}
         />
-        <Typography variant="h5" sx={{color: "white"}}>{user?.username}</Typography>
+        <Typography variant="h5" sx={{ color: "white" }}>
+          {user?.username}
+        </Typography>
       </Button>
 
       <Menu

@@ -14,7 +14,7 @@ import { WaitPage } from "./WaitPage";
 export const Home = () => {
   const [, setPosts] = useAtom(postsListAtom);
   const [, setLikes] = useAtom(likedListAtom);
-  
+
   const { mutate, isLoading } = useMutation(AppServises.getPosts, {
     onSuccess: (data) => {
       setPosts(data.posts);
@@ -29,13 +29,13 @@ export const Home = () => {
     mutate();
   }, []);
 
-  if(isLoading){
-    return <WaitPage/>
+  if (isLoading) {
+    return <WaitPage />;
   }
 
   return (
     <Paper
-    square
+      square
       sx={{
         minHeight: "100vh",
         maxHeight: "auto",
@@ -59,10 +59,10 @@ export const Home = () => {
         }}
       >
         <MakePost />
-        <PostsList redirect={true} isRemovable={false}/>
+        <PostsList redirect={true} isRemovable={false} />
       </Paper>
-      <UpButton/>
-      <Footer/>
+      <UpButton />
+      <Footer />
     </Paper>
   );
 };

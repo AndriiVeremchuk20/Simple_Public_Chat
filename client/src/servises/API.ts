@@ -6,7 +6,7 @@ import {
   PostRequestBody,
   PostResponseData,
 } from "../types/Post";
-import { Subscribe } from "../types/Subscribe";
+import { getSubscribedUsersResponse, Subscribe } from "../types/Subscribe";
 import {
   LoginUser,
   RegistrationUser,
@@ -78,8 +78,8 @@ const getUserInfo = async (userID: string) => {
     user: User;
     posts: Array<Post>;
     likes: Array<Like>;
-    subscriptions: Array<Subscribe>,
-    followers: Array<Subscribe>,
+    subscriptions: Array<Subscribe>;
+    followers: Array<Subscribe>;
   }>(`auth/user/${userID}`, {
     headers: { Authorization: token },
   });
@@ -117,7 +117,7 @@ const likeIt = async (postId: string) => {
   const body: LikeRequestBody = {
     postId: postId,
   };
-  const response = await client.post<Like>("posts/likePost", body, {
+  const response = await client.post<Like>("like", body, {
     headers: { Authorization: token },
   });
 
@@ -126,7 +126,7 @@ const likeIt = async (postId: string) => {
 
 const removeLike = async (postId: string) => {
   const token = Token.Get();
-  const response = await client.delete<any>(`posts/likePost/${postId}`, {
+  const response = await client.delete<any>(`like/${postId}`, {
     headers: { Authorization: token },
   });
 
@@ -145,14 +145,24 @@ const subscribeTo = async (id: string) => {
   return response.data;
 };
 
-const unsubscribeTO =  async (id: string) => {
+const unsubscribeTO = async (id: string) => {
   const token = Token.Get();
-  const response = await client.delete<{id: string}>(`subscribe/${id}`, {
+  const response = await client.delete<{ id: string }>(`subscribe/${id}`, {
     headers: { Authorization: token },
   });
 
   return response.data;
 };
+
+const getSubscribedUsers =async (userId: string) => {
+  const token = Token.Get();
+  const response = await client.get<getSubscribedUsersResponse>(`subscribe/${userId}`, {
+    headers: { Authorization: token },
+  });
+
+  return response.data;
+}
+
 
 export const AppServises = {
   register,
@@ -168,4 +178,5 @@ export const AppServises = {
   removeLike,
   subscribeTo,
   unsubscribeTO,
+  getSubscribedUsers,
 };

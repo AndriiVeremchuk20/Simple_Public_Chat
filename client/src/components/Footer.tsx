@@ -2,8 +2,7 @@ import React from "react";
 import { Box, styled, Typography } from "@mui/material";
 
 export const Footer = () => {
-  
-    return (
+  return (
     <MUIFooter>
       <Box
         sx={{
@@ -70,7 +69,7 @@ const MUIFooter = styled(Box)(({ theme }) => ({
   alignItems: "center",
   borderTop: "solid 2px lightblue",
   padding: "0 0 10px 0",
-  margin: "10px 0 0 0"
+  margin: "10px 0 0 0",
 }));
 
 const Image = styled("img")(({ theme }) => ({

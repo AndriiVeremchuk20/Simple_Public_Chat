@@ -8,6 +8,7 @@ import {
   CardActions,
   CardContent,
   CardMedia,
+  Drawer,
   Paper,
   Typography,
 } from "@mui/material";
@@ -19,8 +20,9 @@ import { appUserAtom, likedListAtom, postsListAtom } from "../atom";
 import { ChangeTheme } from "../components/ChangeTheme";
 import { Footer } from "../components/Footer";
 import { PostsList } from "../components/PostsList";
+import { UsersList } from "../components/UsersList";
 import { AppServises } from "../servises/API";
-import { Subscribe } from "../types/Subscribe";
+import { getSubscribedUsersResponse, Subscribe } from "../types/Subscribe";
 import { User } from "../types/User";
 import { chekSubscribed } from "../utils/chekSubscribed";
 import { WaitPage } from "./WaitPage";
@@ -36,12 +38,15 @@ export const Profile = () => {
   const [subscriptions, setSubscriptions] = useState<Array<Subscribe>>([]);
   const [followers, setFollowers] = useState<Array<Subscribe>>([]);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+  const [subscribedUsers, setSubscribedUsers] =
+    useState<getSubscribedUsersResponse | null>(null);
+
+  const [test, setTest] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
   const getUserInfoMutation = useMutation(AppServises.getUserInfo, {
     onSuccess: (data) => {
-      console.log(data);
       setCurrProfile(data.user);
       setUserPosts(data.posts);
       setLikes(data.likes);
@@ -59,8 +64,7 @@ export const Profile = () => {
 
   const subscribeMutation = useMutation(AppServises.subscribeTo, {
     onSuccess: (data) => {
-      console.log(data);
-      setSubscriptions((prev) => [...prev, data]);
+      setFollowers((prev) => [...prev, data]);
     },
     onError: (error: any) => {
       console.log(error);
@@ -69,10 +73,19 @@ export const Profile = () => {
 
   const unsubscribeMutation = useMutation(AppServises.unsubscribeTO, {
     onSuccess: (data) => {
-      console.log(data);
-      setFollowers(prev=>[...prev.filter((item)=>item._id !== data.id)]);
+      setFollowers((prev) => [...prev.filter((item) => item._id !== data.id)]);
     },
     onError: (error: any) => {
+      console.log(error);
+    },
+  });
+
+  const getSubscribedUsers = useMutation(AppServises.getSubscribedUsers, {
+    onSuccess: (data) => {
+      console.log(data);
+      setSubscribedUsers(data);
+    },
+    onError: (error) => {
       console.log(error);
     },
   });
@@ -93,13 +106,29 @@ export const Profile = () => {
     navigate(-1);
   }, []);
 
+  const toggleDrawer =
+    (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
+      if (
+        event &&
+        event.type === "keydown" &&
+        ((event as React.KeyboardEvent).key === "Tab" ||
+          (event as React.KeyboardEvent).key === "Shift")
+      ) {
+        return;
+      }
+
+      setTest(open);
+    };
+
   useEffect(() => {
     if (id) {
       getUserInfoMutation.mutate(id);
+      getSubscribedUsers.mutate(id);
     } else if (appUser) {
       getUserInfoMutation.mutate(appUser._id);
+      getSubscribedUsers.mutate(appUser._id);
     }
-  }, []);
+  }, [id]);
 
   if (getUserInfoMutation.isLoading) {
     return <WaitPage />;
@@ -186,6 +215,13 @@ export const Profile = () => {
                 justifyContent: "space-around",
               }}
             >
+              <Button
+                onClick={() => {
+                  setTest(true);
+                }}
+              >
+                LLL
+              </Button>
               <Typography variant="h5">
                 Num posts: {userPosts.length}
               </Typography>
@@ -193,6 +229,26 @@ export const Profile = () => {
                 Sudscribers: {subscriptions.length}{" "}
               </Typography>
               <Typography variant="h5">Follow: {followers.length}</Typography>
+
+                <Drawer
+                  anchor="bottom"
+                  open={test}
+                  onClose={toggleDrawer(false)}
+                >
+                  <Box
+                    sx={{
+                      minHeight: "50vh",
+                      maxHeight: "auto",
+                      width: "80%",
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                     <UsersList users={subscribedUsers? subscribedUsers.subscriptionsUsers: []} />
+                     <UsersList users={subscribedUsers? subscribedUsers.followersUsers: []} />
+
+                  </Box>
+                </Drawer>
             </Box>
 
             {currProfile?._id !== appUser?._id ? (
@@ -224,5 +280,3 @@ export const Profile = () => {
     </Paper>
   );
 };
-
-///import PersonRemoveIcon from '@mui/icons-material/PersonRemove';

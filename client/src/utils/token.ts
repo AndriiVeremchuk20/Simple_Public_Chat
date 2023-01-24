@@ -1,19 +1,19 @@
-const tokenKey = 'token'
+const tokenKey = "token";
 
 const Set = (value: string) => {
-  localStorage.setItem(tokenKey, value)
-}
+  localStorage.setItem(tokenKey, value);
+};
 
 const Get = () => {
-  return localStorage.getItem(tokenKey)
-}
+  return localStorage.getItem(tokenKey);
+};
 
 const Remove = () => {
-  localStorage.removeItem(tokenKey)
-}
+  localStorage.removeItem(tokenKey);
+};
 
 export const Token = {
   Set,
   Get,
-  Remove
-}
+  Remove,
+};

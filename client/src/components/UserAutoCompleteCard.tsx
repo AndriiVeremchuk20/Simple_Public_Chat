@@ -3,11 +3,6 @@ import React, { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { User } from "../types/User";
 
-
-//onclick redirect to profile page and set _id into query params (rrd v6);
-//on profile page get id from url query params and mutate data from server
-//if into id (query param) id curren user, redirect to your page  
-
 interface UserAutoCompleteCardProps {
   user: User;
 }
@@ -15,25 +10,23 @@ interface UserAutoCompleteCardProps {
 export const UserAutoCompleteCatd: React.FC<UserAutoCompleteCardProps> = ({
   user,
 }) => {
-
   const navigate = useNavigate();
 
-  const onCardClick = useCallback(()=>{
+  const onCardClick = useCallback(() => {
     navigate(`profile/${user._id}`);
-  },[]);
+  }, []);
 
   return (
     <Box
-      
       sx={{
         display: "flex",
         flexDirection: "row",
         width: "auto",
         padding: "5px 10px",
         alignItems: "center",
-        "&:hover":{
+        "&:hover": {
           background: "#8a8a8a",
-        }
+        },
       }}
       onClick={onCardClick}
     >

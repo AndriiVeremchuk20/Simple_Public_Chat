@@ -2,7 +2,6 @@ import {
   Avatar,
   Badge,
   Box,
-  Button,
   CircularProgress,
   Divider,
   ListItem,
@@ -38,7 +37,7 @@ export const PostCard: React.FC<PostCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const [likes, setLikes] = useAtom(likedListAtom);
-  const [,setPosts] = useAtom(postsListAtom);
+  const [, setPosts] = useAtom(postsListAtom);
   const [user] = useAtom(appUserAtom);
   const [numOfLikes, setNumOfLikes] = useState<number>(
     numLikes(post._id, likes)
@@ -52,21 +51,21 @@ export const PostCard: React.FC<PostCardProps> = ({
     onSuccess: (data) => {
       setLikes((state) => [data, ...state]);
     },
-    onError: (error: any)=>{
+    onError: (error: any) => {
       console.log(error);
-    }
+    },
   });
 
   const removeLikeMutation = useMutation(AppServises.removeLike, {
-    onError: (error: any)=>{
+    onError: (error: any) => {
       console.log(error);
-    }
+    },
   });
 
   const removePostMutation = useMutation(AppServises.deletePost, {
     onSuccess: (data) => {
       setLikes((likes) => likes.filter((like) => like.post !== data.post));
-      setPosts((posts) => posts.filter((post)=>post._id!==data.post));
+      setPosts((posts) => posts.filter((post) => post._id !== data.post));
     },
     onError: (error: any) => {
       console.log(error);
