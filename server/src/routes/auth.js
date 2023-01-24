@@ -6,6 +6,7 @@ const User = require('../database/schemas/User');
 const Roles = require('../database/schemas/Roles');
 const UserPosts = require('../database/schemas/UserPost');
 const Likes = require('../database/schemas/Likes');
+const Subsctiptions = require('../database/schemas/Subscribe');
 const { secret } = require('../config');
 const authMiddleware = require('../middleware/authMiddleware');
 //const roleMiddleware = require('../middleware/roleMiddleware');
@@ -166,13 +167,18 @@ router.get("/user/:id", authMiddleware, async (req, res) => {
 
         let userPosts = await UserPosts.find({ postedBy: user }).sort({ createdAt: -1 });
         userPosts = userPosts.map((post) => { post.postedBy = user; return post });
-
+        
         const likes = await Likes.find({});
+
+        const subscriptions = await Subsctiptions.find({subscribed:  id});
+        const followers = await Subsctiptions.find({to: id});
 
         res.status(200).send({
             user: user,
             posts: userPosts,
             likes: likes,
+            subscriptions: subscriptions,
+            followers: followers,
         });
 
     } catch (e) {

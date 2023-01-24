@@ -1,5 +1,5 @@
 export interface Subscribe {
     _id: string,
-    subscribe: string,
+    subscribed: string,
     to: string
 }

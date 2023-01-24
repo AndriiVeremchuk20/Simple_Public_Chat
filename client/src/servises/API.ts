@@ -1,7 +1,18 @@
 import axios from "axios";
-import { Like, LikeRequestBody, Post, PostRequestBody, PostResponseData } from "../types/Post";
+import {
+  Like,
+  LikeRequestBody,
+  Post,
+  PostRequestBody,
+  PostResponseData,
+} from "../types/Post";
 import { Subscribe } from "../types/Subscribe";
-import { LoginUser, RegistrationUser, responseSearchType, User } from "../types/User";
+import {
+  LoginUser,
+  RegistrationUser,
+  responseSearchType,
+  User,
+} from "../types/User";
 import { Token } from "../utils/token";
 
 const PORT = 8080;
@@ -52,82 +63,96 @@ const deleteAccount = async () => {
 
 const searchUsers = async (searchText: string) => {
   const token = Token.Get();
-  const response = await client.get<responseSearchType>(`auth/search?username=${searchText}`, {
-    headers: { Authorization: token },
-  });
+  const response = await client.get<responseSearchType>(
+    `auth/search?username=${searchText}`,
+    {
+      headers: { Authorization: token },
+    }
+  );
   return response.data;
 };
 
 const getUserInfo = async (userID: string) => {
   const token = Token.Get();
-  const response = await client.get<{user: User, posts: Array<Post>, likes:Array<Like>}>(`auth/user/${userID}`, {
+  const response = await client.get<{
+    user: User;
+    posts: Array<Post>;
+    likes: Array<Like>;
+    subscriptions: Array<Subscribe>,
+    followers: Array<Subscribe>,
+  }>(`auth/user/${userID}`, {
     headers: { Authorization: token },
   });
   return response.data;
-}
+};
 
 const makePost = async (postBody: PostRequestBody) => {
   const token = Token.Get();
-  const response = await client.post<Post>("posts/post", postBody, 
-  {
+  const response = await client.post<Post>("posts/post", postBody, {
     headers: { Authorization: token },
-  }
-  );
+  });
   return response.data;
-}
+};
 
 const getPosts = async () => {
   const token = Token.Get();
-  const response = await client.get<PostResponseData>("posts/",
-  {
+  const response = await client.get<PostResponseData>("posts/", {
     headers: { Authorization: token },
   });
 
   return response.data;
-}
+};
 
 const deletePost = async (id: string) => {
   const token = Token.Get();
-  const response = await client.delete<any>(`posts/post/${id}`, 
-  {
+  const response = await client.delete<any>(`posts/post/${id}`, {
     headers: { Authorization: token },
   });
-  
-  return response.data;  
-}
+
+  return response.data;
+};
 
 const likeIt = async (postId: string) => {
   const token = Token.Get();
   const body: LikeRequestBody = {
-    postId: postId
-  }
-  const response = await client.post<Like>("posts/likePost",body, 
-  {
+    postId: postId,
+  };
+  const response = await client.post<Like>("posts/likePost", body, {
     headers: { Authorization: token },
   });
-  
+
   return response.data;
-}
+};
 
 const removeLike = async (postId: string) => {
   const token = Token.Get();
-  const response = await client.delete<any>(`posts/likePost/${postId}`, 
-  {
+  const response = await client.delete<any>(`posts/likePost/${postId}`, {
     headers: { Authorization: token },
   });
-  
-  return response.data; 
-}
 
-const subscribeTo =async (id:string) => {
+  return response.data;
+};
+
+const subscribeTo = async (id: string) => {
   const token = Token.Get();
-  const response = await client.post<Subscribe>(`subscribe/${id}`, 
-  {
+  const requestBody = {
+    to: id,
+  };
+  const response = await client.post<Subscribe>(`subscribe/`, requestBody, {
     headers: { Authorization: token },
   });
-  
-  return response.data; 
-}
+
+  return response.data;
+};
+
+const unsubscribeTO =  async (id: string) => {
+  const token = Token.Get();
+  const response = await client.delete<{id: string}>(`subscribe/${id}`, {
+    headers: { Authorization: token },
+  });
+
+  return response.data;
+};
 
 export const AppServises = {
   register,
@@ -142,4 +167,5 @@ export const AppServises = {
   likeIt,
   removeLike,
   subscribeTo,
+  unsubscribeTO,
 };

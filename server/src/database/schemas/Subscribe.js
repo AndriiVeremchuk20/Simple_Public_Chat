@@ -13,4 +13,4 @@ const SubscribeSchema = Schema({
     }
 })
 
-module.exports = model("subscribes", SubscribeSchema);
+module.exports = model("subscriptions", SubscribeSchema);

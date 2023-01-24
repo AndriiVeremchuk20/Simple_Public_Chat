@@ -15,30 +15,42 @@ import { useAtom } from "jotai";
 import React, { useCallback, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { appUserAtom, likedListAtom, postsListAtom, subscriptionsListAtom } from "../atom";
+import { appUserAtom, likedListAtom, postsListAtom } from "../atom";
 import { ChangeTheme } from "../components/ChangeTheme";
 import { Footer } from "../components/Footer";
 import { PostsList } from "../components/PostsList";
 import { AppServises } from "../servises/API";
+import { Subscribe } from "../types/Subscribe";
 import { User } from "../types/User";
+import { chekSubscribed } from "../utils/chekSubscribed";
 import { WaitPage } from "./WaitPage";
 
 export const Profile = () => {
   const { id } = useParams();
+
   const [appUser] = useAtom(appUserAtom);
   const [userPosts, setUserPosts] = useAtom(postsListAtom);
   const [, setLikes] = useAtom(likedListAtom);
-  const [subscriptions, setSubscriptions] = useAtom(subscriptionsListAtom);
+
   const [currProfile, setCurrProfile] = useState<User | null>(null);
+  const [subscriptions, setSubscriptions] = useState<Array<Subscribe>>([]);
+  const [followers, setFollowers] = useState<Array<Subscribe>>([]);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
   const getUserInfoMutation = useMutation(AppServises.getUserInfo, {
     onSuccess: (data) => {
+      console.log(data);
       setCurrProfile(data.user);
       setUserPosts(data.posts);
       setLikes(data.likes);
+      setSubscriptions(data.subscriptions);
+      setFollowers(data.followers);
+
+      setIsSubscribed(
+        chekSubscribed((appUser as User)._id, data.user._id, data.followers)
+      );
     },
     onError: (error: any) => {
       console.log(error);
@@ -46,11 +58,36 @@ export const Profile = () => {
   });
 
   const subscribeMutation = useMutation(AppServises.subscribeTo, {
-    onSuccess: (data)=>{
+    onSuccess: (data) => {
       console.log(data);
+      setSubscriptions((prev) => [...prev, data]);
+    },
+    onError: (error: any) => {
+      console.log(error);
+    },
+  });
+
+  const unsubscribeMutation = useMutation(AppServises.unsubscribeTO, {
+    onSuccess: (data) => {
+      console.log(data);
+      setFollowers(prev=>[...prev.filter((item)=>item._id !== data.id)]);
+    },
+    onError: (error: any) => {
+      console.log(error);
+    },
+  });
+
+  const onSubscribeClick = useCallback(() => {
+    if (currProfile) {
+      if (isSubscribed) {
+        unsubscribeMutation.mutate(currProfile._id);
+        setIsSubscribed(false);
+      } else {
+        subscribeMutation.mutate(currProfile._id);
+        setIsSubscribed(true);
+      }
     }
-    
-  })
+  }, [currProfile, isSubscribed]);
 
   const onBackClick = useCallback(() => {
     navigate(-1);
@@ -142,18 +179,36 @@ export const Profile = () => {
               alignItems: "center",
             }}
           >
-            <Box sx={{width: "100%", display: "flex", justifyContent: "space-around"}}>
-            <Typography variant="h5">Num posts: {userPosts.length}</Typography>
-            <Typography variant="h5">Sudscribers: </Typography>
-            <Typography variant="h5">Follow: </Typography>
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "space-around",
+              }}
+            >
+              <Typography variant="h5">
+                Num posts: {userPosts.length}
+              </Typography>
+              <Typography variant="h5">
+                Sudscribers: {subscriptions.length}{" "}
+              </Typography>
+              <Typography variant="h5">Follow: {followers.length}</Typography>
             </Box>
 
             {currProfile?._id !== appUser?._id ? (
-              <CardActions sx={{width: "100%", display: "flex", justifyContent: "center"}}>
-                <Button sx={{width: "80%", padding: "20px 3px"}}>
-                  {
-                    isSubscribed?<PersonRemove/>:<PersonAdd/>
-                  }
+              <CardActions
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <Button
+                  sx={{ width: "80%", padding: "20px 3px" }}
+                  onClick={onSubscribeClick}
+                  variant={isSubscribed ? "outlined" : "contained"}
+                >
+                  {isSubscribed ? <PersonRemove /> : <PersonAdd />}
                 </Button>
               </CardActions>
             ) : null}
