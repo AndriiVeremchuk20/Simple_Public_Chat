@@ -79,7 +79,7 @@ const getUserInfo = async (userID: string) => {
     posts: Array<Post>;
     likes: Array<Like>;
     subscriptions: Array<Subscribe>;
-    followers: Array<Subscribe>;
+    subscribers: Array<Subscribe>;
   }>(`auth/user/${userID}`, {
     headers: { Authorization: token },
   });

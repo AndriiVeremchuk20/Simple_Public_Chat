@@ -29,7 +29,6 @@ export const MakePost = () => {
     AppServises.makePost,
     {
       onSuccess: (data) => {
-        console.log(data);
         setPosts((posts) => [data, ...posts]);
         setPostText("");
       },

@@ -1,23 +1,46 @@
 import { Paper } from "@mui/material";
 import { useAtom } from "jotai";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useMutation } from "react-query";
-import { likedListAtom, postsListAtom } from "../atom";
+import {
+  appUserAtom,
+  likedListAtom,
+  postsListAtom,
+  subscribersListAtom,
+  subscriptionsListAtom,
+} from "../atom";
 import { Footer } from "../components/Footer";
 import { MakePost } from "../components/MakePost";
 import { PostsList } from "../components/PostsList";
 import { SearchBar } from "../components/SearchBar";
 import { UpButton } from "../components/UpButton";
 import { AppServises } from "../servises/API";
+import { Post } from "../types/Post";
 import { WaitPage } from "./WaitPage";
 
 export const Home = () => {
+  const [user] = useAtom(appUserAtom);
   const [, setPosts] = useAtom(postsListAtom);
   const [, setLikes] = useAtom(likedListAtom);
+  const [, setSubscribers] = useAtom(subscribersListAtom);
+  const [, setSubscriptions] = useAtom(subscriptionsListAtom);
 
-  const { mutate, isLoading } = useMutation(AppServises.getPosts, {
+  const [allPosts, setAllPosts] = useState<Array<Post>>([]);
+
+  const getUserDataMutation = useMutation(AppServises.getUserInfo, {
     onSuccess: (data) => {
       setPosts(data.posts);
+      setSubscriptions(data.subscriptions);
+      setSubscribers(data.subscribers);
+    },
+    onError: (error: any) => {
+      console.log(error);
+    },
+  });
+
+  const getAllPostsMutation = useMutation(AppServises.getPosts, {
+    onSuccess: (data) => {
+      setAllPosts(data.posts);
       setLikes(data.likes);
     },
     onError: (error: any) => {
@@ -26,10 +49,11 @@ export const Home = () => {
   });
 
   useEffect(() => {
-    mutate();
+    getAllPostsMutation.mutate();
+    if (user) getUserDataMutation.mutate(user._id);
   }, []);
 
-  if (isLoading) {
+  if (getAllPostsMutation.isLoading || getUserDataMutation.isLoading) {
     return <WaitPage />;
   }
 
@@ -59,7 +83,7 @@ export const Home = () => {
         }}
       >
         <MakePost />
-        <PostsList redirect={true} isRemovable={false} />
+        <PostsList posts={allPosts} redirect={true} isRemovable={false} />
       </Paper>
       <UpButton />
       <Footer />

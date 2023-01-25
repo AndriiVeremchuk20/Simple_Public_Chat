@@ -11,7 +11,7 @@ export const UsersList: React.FC<UserListProps> = ({ users }) => {
   return (
       <List
         sx={{
-          width: "100%",
+          width: "80%",
         }}
       >
         {users.map((user) => (

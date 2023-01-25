@@ -1,19 +1,19 @@
 import { List, Paper, Typography } from "@mui/material";
-import { useAtom } from "jotai";
 import React from "react";
-import { postsListAtom } from "../atom";
+import { Post } from "../types/Post";
 import { PostCard } from "./PostCard";
 
 interface PostslistProps {
+  posts: Array<Post>;
   redirect: boolean;
   isRemovable: boolean;
 }
 
 export const PostsList: React.FC<PostslistProps> = ({
+  posts,
   redirect,
   isRemovable,
 }) => {
-  const [posts] = useAtom(postsListAtom);
 
   return (
     <Paper elevation={2} sx={{ width: "80%", margin: "15px 0 15px 0 " }}>

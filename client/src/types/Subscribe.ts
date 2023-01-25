@@ -7,6 +7,12 @@ export interface Subscribe {
 }
 
 export interface getSubscribedUsersResponse {
-  followersUsers: Array<User>;
   subscriptionsUsers: Array<User>;
+  subscribersUsers: Array<User>;
 }
+
+/*
+подписчики subscribers
+
+подписки subscriptions
+*/

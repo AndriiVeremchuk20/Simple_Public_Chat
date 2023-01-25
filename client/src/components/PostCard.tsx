@@ -57,6 +57,10 @@ export const PostCard: React.FC<PostCardProps> = ({
   });
 
   const removeLikeMutation = useMutation(AppServises.removeLike, {
+    onSuccess: (data) => {
+      console.log(data);
+      setLikes((prev)=>[...prev.filter((like)=>like._id!==data._id)]);
+    },
     onError: (error: any) => {
       console.log(error);
     },
