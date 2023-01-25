@@ -9,20 +9,14 @@ interface UserListProps {
 
 export const UsersList: React.FC<UserListProps> = ({ users }) => {
   return (
-    <Paper>
       <List
         sx={{
-          "&:hover": {
-            background: "rgda(1,1,1,.3)",
-          },
+          width: "100%",
         }}
       >
         {users.map((user) => (
-          <>
-            <UserCard key={user._id} user={user} />
-          </>
+          <UserCard key={user._id} user={user} />
         ))}
       </List>
-    </Paper>
   );
 };

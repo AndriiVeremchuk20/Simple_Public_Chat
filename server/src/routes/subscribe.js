@@ -65,7 +65,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
             await Users.findOne({ _id: subscription.to }).select('username avatarUrl email createdAt')));
     
         const followersUsers = await Promise.all(followers.map(async (follow) =>
-            await Users.findOne({ _id: follow.to }).select('username avatarUrl email createdAt')));
+            await Users.findOne({ _id: follow.subscribed }).select('username avatarUrl email createdAt')));
     
         res.status(200).send({subscriptionsUsers: subscriptionsUsers, followersUsers: followersUsers});
    

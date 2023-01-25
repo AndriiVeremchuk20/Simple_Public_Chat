@@ -37,11 +37,12 @@ export const Profile = () => {
   const [currProfile, setCurrProfile] = useState<User | null>(null);
   const [subscriptions, setSubscriptions] = useState<Array<Subscribe>>([]);
   const [followers, setFollowers] = useState<Array<Subscribe>>([]);
-  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
-  const [subscribedUsers, setSubscribedUsers] =
-    useState<getSubscribedUsersResponse | null>(null);
 
-  const [test, setTest] = useState<boolean>(false);
+  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+  const [subscriptionsUsers, setSubscriptionsUsers] =
+    useState<getSubscribedUsersResponse | null>(null);
+  const [usersToShow, setUsersToShow] = useState<Array<User>>([]);
+  const [showSudscribedUsers, setShowSubscrUsers] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -73,7 +74,7 @@ export const Profile = () => {
 
   const unsubscribeMutation = useMutation(AppServises.unsubscribeTO, {
     onSuccess: (data) => {
-      setFollowers((prev) => [...prev.filter((item) => item._id !== data.id)]);
+      setFollowers((prev) => prev.filter((item) => item._id !== data.id));
     },
     onError: (error: any) => {
       console.log(error);
@@ -83,7 +84,7 @@ export const Profile = () => {
   const getSubscribedUsers = useMutation(AppServises.getSubscribedUsers, {
     onSuccess: (data) => {
       console.log(data);
-      setSubscribedUsers(data);
+      setSubscriptionsUsers(data);
     },
     onError: (error) => {
       console.log(error);
@@ -106,6 +107,20 @@ export const Profile = () => {
     navigate(-1);
   }, []);
 
+  const onSubscribersClick = useCallback(() => {
+    setUsersToShow(
+      subscriptionsUsers ? subscriptionsUsers.subscriptionsUsers : []
+    );
+    console.log(subscriptionsUsers);
+    setShowSubscrUsers(true);
+    
+  }, [subscriptionsUsers]);
+
+  const onFollowersClick = useCallback(() => {
+    setUsersToShow(subscriptionsUsers ? subscriptionsUsers.followersUsers : []);
+    setShowSubscrUsers(true);
+  }, [subscriptionsUsers]);
+
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
       if (
@@ -116,8 +131,7 @@ export const Profile = () => {
       ) {
         return;
       }
-
-      setTest(open);
+      setShowSubscrUsers(false)
     };
 
   useEffect(() => {
@@ -129,6 +143,7 @@ export const Profile = () => {
       getSubscribedUsers.mutate(appUser._id);
     }
   }, [id]);
+
 
   if (getUserInfoMutation.isLoading) {
     return <WaitPage />;
@@ -215,40 +230,37 @@ export const Profile = () => {
                 justifyContent: "space-around",
               }}
             >
-              <Button
-                onClick={() => {
-                  setTest(true);
-                }}
-              >
-                LLL
-              </Button>
               <Typography variant="h5">
                 Num posts: {userPosts.length}
               </Typography>
-              <Typography variant="h5">
-                Sudscribers: {subscriptions.length}{" "}
-              </Typography>
-              <Typography variant="h5">Follow: {followers.length}</Typography>
 
-                <Drawer
-                  anchor="bottom"
-                  open={test}
-                  onClose={toggleDrawer(false)}
+              <Box sx={{cursor: "pointer"}} onClick = {onSubscribersClick}>
+                <Typography variant="h5">
+                  Sudscribers: {subscriptions.length}{" "}
+                </Typography>
+              </Box>
+
+              <Box sx={{cursor: "pointer"}} onClick={onFollowersClick}>
+                <Typography variant="h5">Follow: {followers.length}</Typography>
+              </Box>
+
+              <Drawer
+                anchor="bottom"
+                open={showSudscribedUsers}
+                onClose={toggleDrawer(false)}
+              >
+                <Box
+                  sx={{
+                    minHeight: "50vh",
+                    maxHeight: "auto",
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
                 >
-                  <Box
-                    sx={{
-                      minHeight: "50vh",
-                      maxHeight: "auto",
-                      width: "80%",
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                     <UsersList users={subscribedUsers? subscribedUsers.subscriptionsUsers: []} />
-                     <UsersList users={subscribedUsers? subscribedUsers.followersUsers: []} />
-
-                  </Box>
-                </Drawer>
+                  <UsersList users={usersToShow} />
+                </Box>
+              </Drawer>
             </Box>
 
             {currProfile?._id !== appUser?._id ? (
