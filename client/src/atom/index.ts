@@ -10,10 +10,3 @@ export const likedListAtom = atom<Array<Like>>([]);
 export const subscribersListAtom = atom<Array<Subscribe>>([]);
 export const subscriptionsListAtom = atom<Array<Subscribe>>([]);
 export const darkModeAtom = atomWithStorage<boolean>("isDark", true);
-
-
-/*
-подписчики subscribers
-
-подписки subscriptions
-*/
