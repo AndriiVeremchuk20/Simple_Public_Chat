@@ -12,7 +12,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 //const roleMiddleware = require('../middleware/roleMiddleware');
 const router = Router();
 
-const generateAccessTocken = (id, roles) => {
+const generateAccessToken = (id, roles) => {
     const payload = {
         id: id,
         roles: roles,
@@ -66,7 +66,7 @@ router.post('/login', async (req, res) => {
 
         else if (await comparePassword(password, user.password)) {
             console.log(user);
-            const token = generateAccessTocken(user._id, user.roles)
+            const token = generateAccessToken(user._id, user.roles)
             res.status(201).send({
                 token,
                 user: {
@@ -91,7 +91,7 @@ router.get('/auth', authMiddleware, async (req, res) => {
         const { id } = req.user;
         const user = await User.findOne({ _id: id });
 
-        const token = generateAccessTocken(user._id, user.roles);
+        const token = generateAccessToken(user._id, user.roles);
         res.status(201).send({
             token,
             user: {
